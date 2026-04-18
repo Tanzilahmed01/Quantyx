@@ -10,24 +10,24 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #f5f6fa;
-      --bg2:      #ffffff;
-      --bg3:      #f0f2f8;
-      --border:   #e2e6f0;
-      --border2:  #d0d6e8;
-      --text:     #1a1f36;
-      --muted:    #6b7a9a;
-      --dim:      #9aa5c0;
-      --accent:   #4361ee;
-      --accent2:  #7209b7;
-      --green:    #0ead69;
-      --amber:    #f4a100;
-      --red:      #e63757;
-      --radius:   8px;
-      --shadow:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
-      --font-ui:  'Inter', sans-serif;
-      --font-mono:'JetBrains Mono', monospace;
+      --bg:        #f5f6fa;
+      --bg2:       #ffffff;
+      --bg3:       #f0f2f8;
+      --border:    #e2e6f0;
+      --border2:   #d0d6e8;
+      --text:      #1a1f36;
+      --muted:     #6b7a9a;
+      --dim:       #9aa5c0;
+      --accent:    #4361ee;
+      --accent2:   #7209b7;
+      --green:     #0ead69;
+      --amber:     #f4a100;
+      --red:       #e63757;
+      --radius:    8px;
+      --shadow:    0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+      --font-ui:   'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; min-height: 100vh; }
@@ -147,7 +147,7 @@
     .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
     .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    /* LOADING */
+    /* LOADING / EMPTY */
     .loading { text-align: center; padding: 80px; color: var(--muted); }
     .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -183,10 +183,36 @@
     .col-item input { cursor: pointer; accent-color: var(--accent); }
     .col-item label { cursor: pointer; font-size: 12px; }
 
-    /* Toast */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 12px; font-weight: 500; z-index: 9999; animation: toast-in 0.2s ease, toast-out 0.3s ease 1.5s forwards; box-shadow: var(--shadow-md); }
+    /* TOAST */
+    .toast { position: fixed; bottom: 72px; right: 24px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 12px; font-weight: 500; z-index: 9999; animation: toast-in 0.2s ease, toast-out 0.3s ease 1.7s forwards; box-shadow: var(--shadow-md); }
     @keyframes toast-in { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
     @keyframes toast-out { to{transform:translateY(6px);opacity:0} }
+
+    /* DOWNLOAD BAR */
+    .dl-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); padding: 0 20px; height: 56px; display: flex; align-items: center; gap: 12px; z-index: 9998; transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 -4px 20px rgba(0,0,0,0.1); }
+    .dl-bar.show { transform: translateY(0); }
+    .dl-icon { width: 30px; height: 30px; border-radius: 8px; background: #eef1ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.3s; }
+    .dl-icon.done { background: #e8faf2; }
+    .dl-icon.error { background: #fff0f3; }
+    .dl-icon svg { width: 15px; height: 15px; }
+    .dl-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex-shrink: 0; width: 200px; }
+    .dl-title { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dl-sub { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dl-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; min-width: 80px; }
+    .dl-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.4s ease, background 0.3s; }
+    .dl-fill.indeterminate { animation: indeterminate 1.5s ease-in-out infinite; }
+    @keyframes indeterminate {
+      0%   { width: 0%;   margin-left: 0%; }
+      50%  { width: 40%;  margin-left: 30%; }
+      100% { width: 0%;   margin-left: 100%; }
+    }
+    .dl-stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; min-width: 80px; }
+    .dl-pct { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+    .dl-pct.done  { color: var(--green); }
+    .dl-pct.error { color: var(--red); }
+    .dl-rows { font-size: 10px; color: var(--dim); font-family: var(--font-mono); }
+    .dl-close { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.15s; flex-shrink: 0; }
+    .dl-close:hover { background: var(--bg3); color: var(--text); }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -227,7 +253,7 @@
       </div>
     </div>
     <div style="width:1px;height:24px;background:var(--border);"></div>
-    <div class="status-dot"><div class="dot-live"></div><span id="backend-status">Connecting…</span></div>
+    <div class="status-dot"><div class="dot-live"></div><span id="backend-status">Connecting...</span></div>
   </div>
 
   <div class="nav-right">
@@ -235,8 +261,8 @@
       <div class="clock-time" id="clock-time">--:--:--</div>
       <div class="clock-date" id="clock-date">---</div>
     </div>
-    <button class="btn" onclick="exportCSV()">↓ Export CSV</button>
-    <button class="btn btn-primary" onclick="loadData()">↻ Refresh</button>
+    <button class="btn" onclick="exportCSV()">&#8595; Export CSV</button>
+    <button class="btn btn-primary" onclick="loadData()">&#8635; Refresh</button>
   </div>
 </nav>
 
@@ -277,6 +303,7 @@
 <div class="layout">
   <!-- SIDEBAR -->
   <aside class="sidebar">
+
     <!-- DATE FILTER -->
     <div class="date-filter-box">
       <div class="date-filter-title">
@@ -300,20 +327,45 @@
       </div>
       <div class="date-badge" id="date-badge">
         <span id="date-badge-text"></span>
-        <span class="date-badge-clear" onclick="clearDate()" title="Clear date filter">✕</span>
+        <span class="date-badge-clear" onclick="clearDate()">&#x2715;</span>
       </div>
     </div>
 
-    <div class="filter-group"><div class="filter-header">Seniority</div><select class="filter-select" id="f-seniority" onchange="applyFilters()"><option value="">All</option></select></div>
-    <div class="filter-group"><div class="filter-header">Department</div><select class="filter-select" id="f-department" onchange="applyFilters()"><option value="">All</option></select></div>
-    <div class="filter-group"><div class="filter-header">Industry</div><select class="filter-select" id="f-industry" onchange="applyFilters()"><option value="">All</option></select></div>
-    <div class="filter-group"><div class="filter-header">Country</div><select class="filter-select" id="f-country" onchange="applyFilters()"><option value="">All</option></select></div>
-    <div class="filter-group"><div class="filter-header">Company</div><input class="filter-input" id="f-company" placeholder="Search company..." oninput="debounceFilter()"/></div>
-    <div class="filter-group"><div class="filter-header">City</div><input class="filter-input" id="f-city" placeholder="Search city..." oninput="debounceFilter()"/></div>
-    <div class="filter-group"><div class="filter-header">RA Name</div><select class="filter-select" id="f-ra" onchange="applyFilters()"><option value="">All</option></select></div>
+    <div class="filter-group">
+      <div class="filter-header">Seniority</div>
+      <select class="filter-select" id="f-seniority" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">Department</div>
+      <select class="filter-select" id="f-department" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">Industry</div>
+      <select class="filter-select" id="f-industry" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">Country</div>
+      <select class="filter-select" id="f-country" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">Company</div>
+      <input class="filter-input" id="f-company" placeholder="Search company..." oninput="debounceFilter()"/>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">City</div>
+      <input class="filter-input" id="f-city" placeholder="Search city..." oninput="debounceFilter()"/>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">Job Title</div>
+      <input class="filter-input" id="f-jobtitle" placeholder="Search job title..." oninput="debounceFilter()"/>
+    </div>
+    <div class="filter-group">
+      <div class="filter-header">RA Name</div>
+      <select class="filter-select" id="f-ra" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
 
     <div style="margin-top:auto;padding-top:14px;">
-      <button class="btn btn-danger" style="width:100%;justify-content:center;" onclick="clearFilters()">✕  Clear All Filters</button>
+      <button class="btn btn-danger" style="width:100%;justify-content:center;" onclick="clearFilters()">&#x2715; Clear All Filters</button>
     </div>
   </aside>
 
@@ -321,18 +373,18 @@
   <div class="main">
     <div class="toolbar">
       <div class="search-wrap">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">&#128269;</span>
         <input class="search-input" id="search" placeholder="Search name, email, company, city, title..." oninput="debounceFilter()"/>
       </div>
       <span class="result-count"><strong id="result-num">0</strong> of <strong id="result-total">0</strong> records</span>
       <div class="cols-dropdown">
-        <button class="btn btn-ghost" onclick="toggleColsMenu()">⊞ Columns</button>
+        <button class="btn btn-ghost" onclick="toggleColsMenu()">&#8862; Columns</button>
         <div class="cols-menu" id="cols-menu"></div>
       </div>
     </div>
 
     <div class="table-wrap" id="table-wrap">
-      <div class="loading"><div class="spinner"></div><div>Connecting to backend…</div></div>
+      <div class="loading"><div class="spinner"></div><div>Connecting to backend...</div></div>
     </div>
 
     <div class="pagination">
@@ -345,53 +397,79 @@
   <aside class="detail-panel" id="detail-panel">
     <div class="detail-topbar">
       <div class="detail-tag">Contact Record</div>
-      <div class="detail-close" onclick="closeDetail()">✕</div>
+      <div class="detail-close" onclick="closeDetail()">&#x2715;</div>
     </div>
     <div id="detail-content"></div>
   </aside>
 </div>
 
+<!-- DOWNLOAD BAR -->
+<div class="dl-bar" id="dl-bar">
+  <div class="dl-icon" id="dl-icon">
+    <svg id="dl-svg-down" viewBox="0 0 24 24" fill="none" stroke="#4361ee" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    <svg id="dl-svg-ok" viewBox="0 0 24 24" fill="none" stroke="#0ead69" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <svg id="dl-svg-err" viewBox="0 0 24 24" fill="none" stroke="#e63757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  </div>
+  <div class="dl-info">
+    <div class="dl-title" id="dl-title">Preparing export...</div>
+    <div class="dl-sub"   id="dl-sub">Starting...</div>
+  </div>
+  <div class="dl-track">
+    <div class="dl-fill indeterminate" id="dl-fill"></div>
+  </div>
+  <div class="dl-stats">
+    <div class="dl-pct"  id="dl-pct"></div>
+    <div class="dl-rows" id="dl-rows"></div>
+  </div>
+  <button class="dl-close" onclick="hideDlBar()">&#x2715;</button>
+</div>
+
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-// ⚠️ CHANGE THIS to your Render backend URL after deploying
-const API_BASE = "https://quantyx-backend.onrender.com";
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const API_BASE = "https://quantyx-backend.onrender.com"; // <-- your Render URL
 // ─────────────────────────────────────────────────────────────────────────────
 
-let currentPage = 1;
-let totalRecords = 0;
-let totalPages = 1;
+let currentPage = 1, totalRecords = 0, totalPages = 1;
 let sortCol = "id", sortDir = "asc";
 let debounceTimer = null;
 const PER_PAGE = 50;
 
 const COLUMNS = [
-  { key:"First_Name",        label:"Name",            visible:true,  render:"name"  },
-  { key:"Company_Name",      label:"Company",         visible:true,  render:"text"  },
-  { key:"Job_Title",         label:"Job Title",       visible:true,  render:"text"  },
-  { key:"Email_ID_ABM",      label:"Email (ABM)",     visible:true,  render:"email" },
-  { key:"Email_ID_Finding",  label:"Email (Finding)", visible:false, render:"email" },
-  { key:"Department",        label:"Department",      visible:true,  render:"pill"  },
-  { key:"Seniority",         label:"Seniority",       visible:true,  render:"pill"  },
-  { key:"Industry",          label:"Industry",        visible:true,  render:"text"  },
-  { key:"Telephone_No",      label:"Phone",           visible:false, render:"text"  },
-  { key:"City",              label:"City",            visible:true,  render:"text"  },
-  { key:"Country",           label:"Country",         visible:true,  render:"text"  },
-  { key:"Emp_Size",          label:"Emp Size",        visible:false, render:"text"  },
-  { key:"Revenue",           label:"Revenue",         visible:false, render:"text"  },
-  { key:"Date",              label:"Date Added",      visible:true,  render:"date"  },
-  { key:"RA_Name",           label:"RA Name",         visible:false, render:"text"  },
-  { key:"Campaign_Name",     label:"Campaign",        visible:false, render:"text"  },
+  { key:"First_Name",       label:"Name",            visible:true,  render:"name"  },
+  { key:"Company_Name",     label:"Company",         visible:true,  render:"text"  },
+  { key:"Job_Title",        label:"Job Title",       visible:true,  render:"text"  },
+  { key:"Email_ID_ABM",     label:"Email (ABM)",     visible:true,  render:"email" },
+  { key:"Email_ID_Finding", label:"Email (Finding)", visible:false, render:"email" },
+  { key:"Department",       label:"Department",      visible:true,  render:"pill"  },
+  { key:"Seniority",        label:"Seniority",       visible:true,  render:"pill"  },
+  { key:"Industry",         label:"Industry",        visible:true,  render:"text"  },
+  { key:"Telephone_No",     label:"Phone",           visible:false, render:"text"  },
+  { key:"City",             label:"City",            visible:true,  render:"text"  },
+  { key:"Country",          label:"Country",         visible:true,  render:"text"  },
+  { key:"Emp_Size",         label:"Emp Size",        visible:false, render:"text"  },
+  { key:"Revenue",          label:"Revenue",         visible:false, render:"text"  },
+  { key:"Date",             label:"Date Added",      visible:true,  render:"date"  },
+  { key:"RA_Name",          label:"RA Name",         visible:false, render:"text"  },
+  { key:"Campaign_Name",    label:"Campaign",        visible:false, render:"text"  },
 ];
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
-function updateClock() {
-  const now = new Date();
+function pad(n){ return String(n).padStart(2,'0'); }
+function updateClock(){
+  const now=new Date();
   const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('clock-time').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  document.getElementById('clock-date').textContent=`${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('clock-date').textContent=`${DAYS[now.getDay()]} ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
 }
-function pad(n){return String(n).padStart(2,'0');}
 setInterval(updateClock,1000); updateClock();
 
 // ── AVATAR PALETTE ────────────────────────────────────────────────────────────
@@ -400,10 +478,10 @@ const PALETTES=[
   {bg:'#f3e8ff',c:'#7209b7'},{bg:'#fff8e6',c:'#b77800'},
   {bg:'#fff0f3',c:'#e63757'},{bg:'#e8f6ff',c:'#0077b6'},
 ];
-function pal(name){return PALETTES[[...(name||'X')].reduce((a,c)=>a+c.charCodeAt(0),0)%PALETTES.length];}
+function pal(name){ return PALETTES[[...(name||'X')].reduce((a,c)=>a+c.charCodeAt(0),0)%PALETTES.length]; }
 
 // ── DATE HELPERS ──────────────────────────────────────────────────────────────
-function toYMD(d){return d.toISOString().slice(0,10);}
+function toYMD(d){ return d.toISOString().slice(0,10); }
 function fmtDate(val){
   if(!val) return null;
   const d=new Date(val); if(isNaN(d)) return {main:val,ago:''};
@@ -418,13 +496,13 @@ function fmtDate(val){
 function setPreset(btn,p){
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const now=new Date(); let from,to=toYMD(now);
-  if     (p==='today')    {from=to;}
-  else if(p==='7d')       {const d=new Date(now);d.setDate(d.getDate()-7);from=toYMD(d);}
-  else if(p==='30d')      {const d=new Date(now);d.setDate(d.getDate()-30);from=toYMD(d);}
-  else if(p==='90d')      {const d=new Date(now);d.setDate(d.getDate()-90);from=toYMD(d);}
-  else if(p==='thismonth'){from=toYMD(new Date(now.getFullYear(),now.getMonth(),1));}
-  else if(p==='lastmonth'){from=toYMD(new Date(now.getFullYear(),now.getMonth()-1,1));to=toYMD(new Date(now.getFullYear(),now.getMonth(),0));}
+  const now=new Date(); let from, to=toYMD(now);
+  if      (p==='today')    { from=to; }
+  else if (p==='7d')       { const d=new Date(now); d.setDate(d.getDate()-7);  from=toYMD(d); }
+  else if (p==='30d')      { const d=new Date(now); d.setDate(d.getDate()-30); from=toYMD(d); }
+  else if (p==='90d')      { const d=new Date(now); d.setDate(d.getDate()-90); from=toYMD(d); }
+  else if (p==='thismonth'){ from=toYMD(new Date(now.getFullYear(),now.getMonth(),1)); }
+  else if (p==='lastmonth'){ from=toYMD(new Date(now.getFullYear(),now.getMonth()-1,1)); to=toYMD(new Date(now.getFullYear(),now.getMonth(),0)); }
   document.getElementById('f-date-from').value=from;
   document.getElementById('f-date-to').value=to;
   applyFilters();
@@ -436,38 +514,40 @@ function clearDate(){
   applyFilters();
 }
 
-// ── BUILD API URL ─────────────────────────────────────────────────────────────
-function buildParams(page=1){
-  const p=new URLSearchParams();
-  p.set('page',page); p.set('limit',PER_PAGE);
-  const search=document.getElementById('search').value.trim();
-  const senior=document.getElementById('f-seniority').value;
-  const dept=document.getElementById('f-department').value;
-  const ind=document.getElementById('f-industry').value;
-  const country=document.getElementById('f-country').value;
-  const company=document.getElementById('f-company').value.trim();
-  const city=document.getElementById('f-city').value.trim();
-  const ra=document.getElementById('f-ra').value;
-  const dFrom=document.getElementById('f-date-from').value;
-  const dTo=document.getElementById('f-date-to').value;
-  if(search)  p.set('search',search);
-  if(senior)  p.set('seniority',senior);
-  if(dept)    p.set('department',dept);
-  if(ind)     p.set('industry',ind);
-  if(country) p.set('country',country);
-  if(company) p.set('company',company);
-  if(city)    p.set('city',city);
-  if(ra)      p.set('ra',ra);
-  if(dFrom)   p.set('dateFrom',dFrom);
-  if(dTo)     p.set('dateTo',dTo);
-  p.set('sortCol',sortCol);
-  p.set('sortDir',sortDir);
+// ── BUILD PARAMS ──────────────────────────────────────────────────────────────
+function buildParams(page){
+  const p = new URLSearchParams();
+  p.set('page', page||1);
+  p.set('limit', PER_PAGE);
+  const search   = document.getElementById('search').value.trim();
+  const senior   = document.getElementById('f-seniority').value;
+  const dept     = document.getElementById('f-department').value;
+  const ind      = document.getElementById('f-industry').value;
+  const country  = document.getElementById('f-country').value;
+  const company  = document.getElementById('f-company').value.trim();
+  const city     = document.getElementById('f-city').value.trim();
+  const jobtitle = document.getElementById('f-jobtitle').value.trim();
+  const ra       = document.getElementById('f-ra').value;
+  const dFrom    = document.getElementById('f-date-from').value;
+  const dTo      = document.getElementById('f-date-to').value;
+  if(search)   p.set('search',   search);
+  if(senior)   p.set('seniority',senior);
+  if(dept)     p.set('department',dept);
+  if(ind)      p.set('industry', ind);
+  if(country)  p.set('country',  country);
+  if(company)  p.set('company',  company);
+  if(city)     p.set('city',     city);
+  if(jobtitle) p.set('jobtitle', jobtitle);
+  if(ra)       p.set('ra',       ra);
+  if(dFrom)    p.set('dateFrom', dFrom);
+  if(dTo)      p.set('dateTo',   dTo);
+  p.set('sortCol', sortCol);
+  p.set('sortDir', sortDir);
   return p;
 }
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
 async function loadData(){
-  // Load stats and filters in parallel
   await Promise.all([loadStats(), loadFilters()]);
   buildColsMenu();
   await fetchPage(1);
@@ -475,38 +555,38 @@ async function loadData(){
 
 async function loadStats(){
   try {
-    const res=await fetch(`${API_BASE}/stats`);
+    const res = await fetch(`${API_BASE}/stats`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const s=await res.json();
-    document.getElementById('s-total').textContent=s.total?.toLocaleString()||'—';
-    document.getElementById('s-companies').textContent=s.uniqueCompanies?.toLocaleString()||'—';
-    document.getElementById('s-countries').textContent=s.uniqueCountries?.toLocaleString()||'—';
-    document.getElementById('s-industries').textContent=s.uniqueIndustries?.toLocaleString()||'—';
-    document.getElementById('nav-total').textContent=s.total?.toLocaleString()||'—';
-    const now=new Date(),M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    document.getElementById('s-updated').textContent=`${now.getDate()} ${M[now.getMonth()]}`;
-    document.getElementById('s-time').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    document.getElementById('backend-status').textContent='Live';
+    const s = await res.json();
+    document.getElementById('s-total').textContent     = (s.total||0).toLocaleString();
+    document.getElementById('s-companies').textContent = (s.uniqueCompanies||0).toLocaleString();
+    document.getElementById('s-countries').textContent = (s.uniqueCountries||0).toLocaleString();
+    document.getElementById('s-industries').textContent= (s.uniqueIndustries||0).toLocaleString();
+    document.getElementById('nav-total').textContent   = (s.total||0).toLocaleString();
+    const now=new Date(), M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('s-updated').textContent = `${now.getDate()} ${M[now.getMonth()]}`;
+    document.getElementById('s-time').textContent    = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.getElementById('backend-status').textContent = 'Live';
   } catch(err){
     console.error('Stats error:',err);
-    document.getElementById('backend-status').textContent='Error';
+    document.getElementById('backend-status').textContent = 'Error';
   }
 }
 
 async function loadFilters(){
   try {
-    const res=await fetch(`${API_BASE}/filters`);
+    const res = await fetch(`${API_BASE}/filters`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const f=await res.json();
-    populateSelect('f-seniority',f.seniority||[]);
-    populateSelect('f-department',f.department||[]);
-    populateSelect('f-industry',f.industry||[]);
-    populateSelect('f-country',f.country||[]);
-    populateSelect('f-ra',f.ra||[]);
+    const f = await res.json();
+    populateSelect('f-seniority',  f.seniority  ||[]);
+    populateSelect('f-department', f.department ||[]);
+    populateSelect('f-industry',   f.industry   ||[]);
+    populateSelect('f-country',    f.country    ||[]);
+    populateSelect('f-ra',         f.ra         ||[]);
   } catch(err){ console.error('Filters error:',err); }
 }
 
-function populateSelect(id,vals){
+function populateSelect(id, vals){
   const sel=document.getElementById(id), cur=sel.value;
   sel.innerHTML='<option value="">All</option>'+vals.map(v=>`<option value="${esc(v)}">${v}</option>`).join('');
   if(cur) sel.value=cur;
@@ -514,30 +594,28 @@ function populateSelect(id,vals){
 
 async function fetchPage(page){
   currentPage=page;
-  document.getElementById('table-wrap').innerHTML='<div class="loading"><div class="spinner"></div><div>Loading…</div></div>';
+  document.getElementById('table-wrap').innerHTML='<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
   try {
-    const params=buildParams(page);
-    const res=await fetch(`${API_BASE}/data?${params}`);
-    if(!res.ok){const e=await res.json();throw new Error(e.error||`HTTP ${res.status}`);}
-    const json=await res.json();
-    totalRecords=json.total||0;
-    totalPages=json.totalPages||Math.ceil(totalRecords/PER_PAGE);
+    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`);
+    if(!res.ok){ const e=await res.json(); throw new Error(e.error||`HTTP ${res.status}`); }
+    const json = await res.json();
+    totalRecords = json.total||0;
+    totalPages   = json.totalPages||Math.ceil(totalRecords/PER_PAGE);
 
-    // Update date badge
     const dFrom=document.getElementById('f-date-from').value;
-    const dTo=document.getElementById('f-date-to').value;
+    const dTo  =document.getElementById('f-date-to').value;
     const badge=document.getElementById('date-badge');
-    if(dFrom||dTo){badge.classList.add('show');document.getElementById('date-badge-text').textContent=`${dFrom||'any'} → ${dTo||'any'}`;}
-    else{badge.classList.remove('show');}
+    if(dFrom||dTo){ badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} -> ${dTo||'any'}`; }
+    else { badge.classList.remove('show'); }
 
-    document.getElementById('result-num').textContent=totalRecords.toLocaleString();
-    document.getElementById('result-total').textContent=totalRecords.toLocaleString();
-    document.getElementById('nav-filtered').textContent=totalRecords.toLocaleString();
+    document.getElementById('result-num').textContent   = totalRecords.toLocaleString();
+    document.getElementById('result-total').textContent = totalRecords.toLocaleString();
+    document.getElementById('nav-filtered').textContent = totalRecords.toLocaleString();
     renderTable(json.data||[], (page-1)*PER_PAGE);
     renderPagination();
   } catch(err){
     console.error('Fetch error:',err);
-    document.getElementById('table-wrap').innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
+    document.getElementById('table-wrap').innerHTML=`<div class="empty"><div class="empty-icon">&#9888;&#65039;</div>${err.message}</div>`;
   }
 }
 
@@ -546,7 +624,7 @@ function debounceFilter(){ clearTimeout(debounceTimer); debounceTimer=setTimeout
 
 function clearFilters(){
   ['f-seniority','f-department','f-industry','f-country','f-ra'].forEach(id=>document.getElementById(id).value='');
-  ['f-company','f-city','search','f-date-from','f-date-to'].forEach(id=>document.getElementById(id).value='');
+  ['f-company','f-city','f-jobtitle','search','f-date-from','f-date-to'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   applyFilters();
 }
@@ -555,13 +633,13 @@ function clearFilters(){
 function renderTable(rows, offset){
   const vis=COLUMNS.filter(c=>c.visible);
   if(!rows.length){
-    document.getElementById('table-wrap').innerHTML='<div class="empty"><div class="empty-icon">🔍</div>No contacts match your filters.</div>';
+    document.getElementById('table-wrap').innerHTML='<div class="empty"><div class="empty-icon">&#128269;</div>No contacts match your filters.</div>';
     return;
   }
   const thead=`<tr>
     <th style="width:44px;">#</th>
     <th style="width:32px;"><input type="checkbox" onchange="toggleAll(this)"/></th>
-    ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`).join('')}
+    ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'&#8593;':'&#8595;'):'&#8597;'}</span></th>`).join('')}
     <th style="width:68px;"></th>
   </tr>`;
   const tbody=rows.map((row,i)=>`
@@ -570,18 +648,18 @@ function renderTable(rows, offset){
       <td onclick="event.stopPropagation()"><input type="checkbox"/></td>
       ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
       <td><div class="row-actions">
-        <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
-        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${row.Email_ID_ABM||row.Email_ID_Finding||''}','Email copied!')">⎘</div>
+        <div class="ra-btn" title="View"       onclick="event.stopPropagation();openDetail(${row.id})">&#8857;</div>
+        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.Email_ID_ABM||row.Email_ID_Finding||'')}','Email copied!')">&#9000;</div>
       </div></td>
     </tr>`).join('');
   document.getElementById('table-wrap').innerHTML=`<table class="table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
 }
 
-function renderCell(col,row){
-  const val=row[col.key]||'',dash=`<span style="color:var(--dim)">—</span>`;
+function renderCell(col, row){
+  const val=row[col.key]||'', dash=`<span style="color:var(--dim)">&#8212;</span>`;
   if(col.render==='name'){
-    const p=pal(row.First_Name||'X'),init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
-    return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${row.First_Name||''} ${row.Last_Name||''}</div><div class="contact-title">${row.Job_Title||''}</div></div></div>`;
+    const p=pal(row.First_Name||'X'), init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div><div class="contact-title">${esc(row.Job_Title||'')}</div></div></div>`;
   }
   if(col.render==='email') return val?`<a class="email-link" href="mailto:${val}" onclick="event.stopPropagation()">${val}</a>`:dash;
   if(col.render==='pill'){
@@ -590,30 +668,33 @@ function renderCell(col,row){
     const cls=Object.keys(MAP).find(k=>val.includes(k))||'pill-gray';
     return `<span class="pill ${cls}">${val}</span>`;
   }
-  if(col.render==='date'){const d=fmtDate(val);if(!d)return dash;return `<div class="date-cell"><div class="date-main">${d.main}</div><div class="date-ago">${d.ago}</div></div>`;}
-  return val||dash;
+  if(col.render==='date'){
+    const d=fmtDate(val); if(!d) return dash;
+    return `<div class="date-cell"><div class="date-main">${d.main}</div><div class="date-ago">${d.ago}</div></div>`;
+  }
+  return esc(val)||dash;
 }
 
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toggleAll(cb){document.querySelectorAll('#table-wrap tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked);}
-function doSort(col){if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=col;sortDir='asc';}fetchPage(1);}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toggleAll(cb){ document.querySelectorAll('#table-wrap tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked); }
+function doSort(col){ if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc'; else{sortCol=col;sortDir='asc';} fetchPage(1); }
 
 // ── PAGINATION ────────────────────────────────────────────────────────────────
 function renderPagination(){
   const from=totalRecords?(currentPage-1)*PER_PAGE+1:0;
   const to=Math.min(currentPage*PER_PAGE,totalRecords);
-  document.getElementById('page-info').textContent=`${from.toLocaleString()}–${to.toLocaleString()} of ${totalRecords.toLocaleString()} records`;
+  document.getElementById('page-info').textContent=`${from.toLocaleString()}-${to.toLocaleString()} of ${totalRecords.toLocaleString()} records`;
   const btns=[];
-  btns.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`);
-  let s=Math.max(1,currentPage-2),e=Math.min(totalPages,currentPage+2);
-  if(s>1){btns.push(`<button class="page-btn" onclick="goPage(1)">1</button>`);if(s>2)btns.push(`<span style="color:var(--dim);padding:0 2px;">…</span>`);}
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>Prev</button>`);
+  let s=Math.max(1,currentPage-2), e=Math.min(totalPages,currentPage+2);
+  if(s>1){ btns.push(`<button class="page-btn" onclick="goPage(1)">1</button>`); if(s>2) btns.push(`<span style="color:var(--dim);padding:0 4px;">...</span>`); }
   for(let i=s;i<=e;i++) btns.push(`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`);
-  if(e<totalPages){if(e<totalPages-1)btns.push(`<span style="color:var(--dim);padding:0 2px;">…</span>`);btns.push(`<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`);}
-  btns.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages||totalPages===0?'disabled':''}>Next ›</button>`);
+  if(e<totalPages){ if(e<totalPages-1) btns.push(`<span style="color:var(--dim);padding:0 4px;">...</span>`); btns.push(`<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`); }
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages||totalPages===0?'disabled':''}>Next</button>`);
   document.getElementById('page-btns').innerHTML=btns.join('');
 }
 
-function goPage(p){if(p<1||p>totalPages)return;fetchPage(p);document.getElementById('table-wrap').scrollTop=0;}
+function goPage(p){ if(p<1||p>totalPages) return; fetchPage(p); document.getElementById('table-wrap').scrollTop=0; }
 
 // ── DETAIL PANEL ──────────────────────────────────────────────────────────────
 async function openDetail(id){
@@ -623,17 +704,17 @@ async function openDetail(id){
     const res=await fetch(`${API_BASE}/record/${id}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const row=await res.json();
-    const p=pal(row.First_Name||'X'),init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
-    const f=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${row[key]}</span></div>`:'';
-    const l=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">↗ Open link</a></div>`:'';
-    const fd=(label,key)=>{if(!row[key])return'';const d=fmtDate(row[key]);return`<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} · ${d.ago}</span></div>`;};
+    const p=pal(row.First_Name||'X'), init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    const f=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>`:'';
+    const l=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>`:'';
+    const fd=(label,key)=>{ if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
     document.getElementById('detail-content').innerHTML=`
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div class="detail-avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div>
         <div>
-          <div class="detail-name">${row.First_Name||''} ${row.Last_Name||''}</div>
-          <div class="detail-sub">${row.Job_Title||'—'}</div>
-          <div class="detail-sub" style="color:var(--accent);font-weight:600;margin-top:3px;">${row.Company_Name||''}</div>
+          <div class="detail-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div>
+          <div class="detail-sub">${esc(row.Job_Title||'—')}</div>
+          <div class="detail-sub" style="color:var(--accent);font-weight:600;margin-top:3px;">${esc(row.Company_Name||'')}</div>
         </div>
       </div>
       <hr class="detail-divider"/>
@@ -641,7 +722,7 @@ async function openDetail(id){
       ${f('Email ABM','Email_ID_ABM')}${f('Email Finding','Email_ID_Finding')}${f('Telephone','Telephone_No')}${f('Alternative No','Alternative_No')}${l('Phone Link','Phone_no_link')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Role</div>
-      ${f('Department','Department')}${f('Seniority','Seniority')}${l('LinkedIn','Social_Media_Link')}
+      ${f('Job Title','Job_Title')}${f('Department','Department')}${f('Seniority','Seniority')}${l('LinkedIn','Social_Media_Link')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Company</div>
       ${f('Industry','Industry')}${f('Industry Code','Industry_Code')}${f('Emp Size','Emp_Size')}${f('Revenue','Revenue')}${f('Domain','Domain')}${l('Company LinkedIn','Company_Linkedin')}${l('Revenue Link','Revenue_Link')}
@@ -653,38 +734,164 @@ async function openDetail(id){
       ${f('Campaign','Campaign_Name')}${fd('Date Added','Date')}${f('RA Name','RA_Name')}${f('RA Comment','RA_Comment')}
     `;
   } catch(err){
-    document.getElementById('detail-content').innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
+    document.getElementById('detail-content').innerHTML=`<div class="empty"><div class="empty-icon">&#9888;</div>${err.message}</div>`;
   }
 }
-function closeDetail(){document.getElementById('detail-panel').classList.remove('open');}
+function closeDetail(){ document.getElementById('detail-panel').classList.remove('open'); }
+
+// ── DOWNLOAD BAR ──────────────────────────────────────────────────────────────
+function dlSetIcon(mode){
+  document.getElementById('dl-svg-down').style.display = mode==='down'  ?'':'none';
+  document.getElementById('dl-svg-ok' ).style.display = mode==='ok'    ?'':'none';
+  document.getElementById('dl-svg-err').style.display = mode==='error' ?'':'none';
+  const icon = document.getElementById('dl-icon');
+  icon.className = 'dl-icon' + (mode==='ok'?'  done':mode==='error'?' error':'');
+}
+
+function showDlBar(title, sub){
+  dlSetIcon('down');
+  document.getElementById('dl-title').textContent = title;
+  document.getElementById('dl-sub').textContent   = sub;
+  const f = document.getElementById('dl-fill');
+  f.style.width=''; f.style.background=''; f.className='dl-fill indeterminate';
+  document.getElementById('dl-pct').textContent  = '';
+  document.getElementById('dl-pct').className    = 'dl-pct';
+  document.getElementById('dl-rows').textContent = '';
+  document.getElementById('dl-bar').classList.add('show');
+}
+
+function updateDlBar(pct, sub, rows){
+  const f = document.getElementById('dl-fill');
+  f.className='dl-fill'; f.style.background=''; f.style.width=Math.round(pct)+'%';
+  document.getElementById('dl-pct').textContent  = Math.round(pct)+'%';
+  document.getElementById('dl-pct').className    = 'dl-pct';
+  if(sub  !== undefined) document.getElementById('dl-sub').textContent  = sub;
+  if(rows !== undefined) document.getElementById('dl-rows').textContent = rows.toLocaleString()+' rows';
+}
+
+function doneDlBar(totalRows, mb){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill'; f.style.width='100%'; f.style.background='var(--green)';
+  dlSetIcon('ok');
+  document.getElementById('dl-pct').textContent  = 'Done';
+  document.getElementById('dl-pct').className    = 'dl-pct done';
+  document.getElementById('dl-sub').textContent  = mb+' MB saved';
+  document.getElementById('dl-rows').textContent = totalRows.toLocaleString()+' rows';
+  setTimeout(hideDlBar, 4000);
+}
+
+function errorDlBar(msg){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill'; f.style.width='100%'; f.style.background='var(--red)';
+  dlSetIcon('error');
+  document.getElementById('dl-pct').textContent = 'Failed';
+  document.getElementById('dl-pct').className   = 'dl-pct error';
+  document.getElementById('dl-sub').textContent = msg;
+  setTimeout(hideDlBar, 5000);
+}
+
+function hideDlBar(){
+  document.getElementById('dl-bar').classList.remove('show');
+  setTimeout(()=>{
+    const f=document.getElementById('dl-fill');
+    f.style.width='0%'; f.style.background=''; f.className='dl-fill';
+  },300);
+}
 
 // ── EXPORT CSV ────────────────────────────────────────────────────────────────
 async function exportCSV(){
-  showToast('Preparing export… this may take a moment for large datasets');
+  const params = buildParams(1);
+  params.delete('page'); params.delete('limit'); params.delete('sortCol'); params.delete('sortDir');
+  const filename = `contacts_${new Date().toISOString().slice(0,10)}.csv`;
+
+  showDlBar(filename, 'Getting row count...');
+
   try {
-    const params=buildParams(1);
-    // Remove pagination params for full export
-    params.delete('page'); params.delete('limit'); params.delete('sortCol'); params.delete('sortDir');
-    const res=await fetch(`${API_BASE}/export?${params}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data=await res.json();
-    const cols=COLUMNS.filter(c=>c.visible);
-    const csv=[[...cols.map(c=>c.label)],...data.map(row=>cols.map(c=>`"${(row[c.key]||'').toString().replace(/"/g,'""')}"`))].map(r=>r.join(',')).join('\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-    a.download=`contacts_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    showToast(`✓ Exported ${data.length.toLocaleString()} records`);
-  } catch(err){ showToast('Export failed: '+err.message); }
+    // Step 1 — get exact total rows (fast, uses index)
+    const countRes = await fetch(`${API_BASE}/export-count?${params}`);
+    if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
+    const { total: totalRows } = await countRes.json();
+    updateDlBar(2, `${totalRows.toLocaleString()} rows to download`, 0);
+
+    // Step 2 — stream CSV from backend
+    const res = await fetch(`${API_BASE}/export?${params}`);
+    if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
+
+    // Read X-Total-Rows header set by backend
+    const headerRows = parseInt(res.headers.get('X-Total-Rows')||'0') || totalRows;
+
+    if(!res.body){
+      // Fallback: no streaming API (old browsers)
+      updateDlBar(50, 'Downloading...');
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+      doneDlBar(headerRows, (blob.size/1024/1024).toFixed(1));
+      return;
+    }
+
+    // Stream and count rows in real time
+    const reader   = res.body.getReader();
+    const decoder  = new TextDecoder();
+    const chunks   = [];
+    let bytesTotal = 0;
+    let rowCount   = 0;
+    let partial    = '';
+
+    while(true){
+      const { done, value } = await reader.read();
+      if(done) break;
+      chunks.push(value);
+      bytesTotal += value.length;
+
+      // Count newlines to track rows received
+      const text = decoder.decode(value, { stream: true });
+      partial += text;
+      const lines = partial.split('\n');
+      rowCount += lines.length - 1;
+      partial = lines[lines.length - 1];
+
+      const pct = headerRows > 0
+        ? Math.min(97, Math.round(2 + (rowCount / headerRows) * 95))
+        : Math.min(97, Math.round(bytesTotal / 1024 / 60));
+      const mb = (bytesTotal / 1024 / 1024).toFixed(1);
+      updateDlBar(pct, `${mb} MB downloaded`, Math.max(0, rowCount - 1));
+    }
+
+    // Finalize and trigger download
+    updateDlBar(98, 'Saving file...');
+    const blob = new Blob(chunks, { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+    doneDlBar(headerRows, (blob.size/1024/1024).toFixed(1));
+
+  } catch(err){
+    console.error('Export error:', err);
+    errorDlBar(err.message);
+  }
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function copyText(text,msg){if(!text)return;navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!'));}
-function showToast(msg){const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2200);}
-function buildColsMenu(){document.getElementById('cols-menu').innerHTML=COLUMNS.map((c,i)=>`<div class="col-item"><input type="checkbox" id="col-${i}" ${c.visible?'checked':''} onchange="toggleCol(${i})"/><label for="col-${i}">${c.label}</label></div>`).join('');}
-function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();}
-function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
-document.addEventListener('click',e=>{if(!e.target.closest('.cols-dropdown')) document.getElementById('cols-menu').classList.remove('open');});
+function copyText(text, msg){
+  if(!text) return;
+  navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!'));
+}
+function showToast(msg){
+  const el=document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2200);
+}
+function buildColsMenu(){
+  document.getElementById('cols-menu').innerHTML=COLUMNS.map((c,i)=>
+    `<div class="col-item"><input type="checkbox" id="col-${i}" ${c.visible?'checked':''} onchange="toggleCol(${i})"/><label for="col-${i}">${c.label}</label></div>`
+  ).join('');
+}
+function toggleCol(i){ COLUMNS[i].visible=!COLUMNS[i].visible; buildColsMenu(); fetchPage(currentPage); }
+function toggleColsMenu(){ document.getElementById('cols-menu').classList.toggle('open'); }
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.cols-dropdown')) document.getElementById('cols-menu').classList.remove('open');
+});
 
 loadData();
 </script>
