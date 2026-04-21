@@ -68,15 +68,62 @@
 
     /* LAYOUT */
     .layout { display: flex; height: calc(100vh - 56px - 89px); }
-    .sidebar { width: 248px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 16px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
-    /* SIDEBAR FILTERS */
-    .filter-group { margin-bottom: 4px; }
-    .filter-header { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; padding: 10px 4px 5px; }
-    .filter-input, .filter-select { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui); outline: none; transition: all 0.15s; }
-    .filter-input:focus, .filter-select:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
-    .filter-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a9a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+    /* ── MULTI-SELECT FILTER ── */
+    .filter-group { margin-bottom: 6px; }
+    .filter-header { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; padding: 8px 2px 4px; }
+
+    /* Multi-select trigger button */
+    .ms-trigger {
+      width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui);
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      gap: 6px; transition: all 0.15s; min-height: 34px;
+    }
+    .ms-trigger:hover { border-color: var(--accent); background: #fff; }
+    .ms-trigger.active { border-color: var(--accent); background: #eef1ff; }
+    .ms-trigger-label { color: var(--muted); font-size: 12px; flex: 1; text-align: left; }
+    .ms-trigger-count { background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: 700; display: none; }
+    .ms-trigger-count.show { display: inline-block; }
+    .ms-chevron { color: var(--dim); font-size: 10px; flex-shrink: 0; transition: transform 0.15s; }
+    .ms-trigger.open .ms-chevron { transform: rotate(180deg); }
+
+    /* Tags row under trigger */
+    .ms-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+    .ms-tag { display: inline-flex; align-items: center; gap: 4px; background: #eef1ff; color: var(--accent); border: 1px solid #d5d9f5; border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 500; max-width: 100%; }
+    .ms-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+    .ms-tag-x { cursor: pointer; font-size: 12px; line-height: 1; flex-shrink: 0; color: #7a8fd4; }
+    .ms-tag-x:hover { color: var(--red); }
+
+    /* Dropdown panel */
+    .ms-dropdown {
+      position: relative; z-index: 50;
+      background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-top: 4px;
+      display: none; flex-direction: column; overflow: hidden;
+      max-height: 260px;
+    }
+    .ms-dropdown.open { display: flex; }
+    .ms-search-wrap { padding: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .ms-search { width: 100%; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: var(--font-ui); color: var(--text); outline: none; }
+    .ms-search:focus { border-color: var(--accent); background: #fff; }
+    .ms-list { overflow-y: auto; flex: 1; padding: 4px; }
+    .ms-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text); }
+    .ms-item:hover { background: var(--bg3); }
+    .ms-item.selected { background: #eef1ff; color: var(--accent); font-weight: 600; }
+    .ms-item input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; flex-shrink: 0; cursor: pointer; }
+    .ms-item label { cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ms-empty { padding: 16px; text-align: center; color: var(--dim); font-size: 12px; }
+    .ms-footer { padding: 6px 8px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .ms-footer-count { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+    .ms-clear-btn { font-size: 11px; color: var(--red); cursor: pointer; font-weight: 600; }
+    .ms-clear-btn:hover { text-decoration: underline; }
+
+    /* Text input filter (for job title search-type) */
+    .filter-input { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui); outline: none; transition: all 0.15s; }
+    .filter-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
 
     /* DATE FILTER BOX */
     .date-filter-box { background: linear-gradient(135deg,#eef1ff 0%,#f5f0ff 100%); border: 1px solid #d5d9f5; border-radius: 10px; padding: 12px; margin-bottom: 8px; }
@@ -91,6 +138,27 @@
     .date-badge { display: none; background: #fff8e1; border: 1px solid #ffe082; border-radius: 5px; padding: 5px 8px; font-size: 10px; color: #7a5800; font-weight: 500; margin-top: 8px; align-items: center; justify-content: space-between; }
     .date-badge.show { display: flex; }
     .date-badge-clear { cursor: pointer; font-weight: 700; font-size: 12px; color: #b07800; }
+
+    /* ── COMPANY FILTER ── */
+    .company-filter-box { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+    .company-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .company-tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; border: none; font-family: var(--font-ui); }
+    .company-tab.active { background: var(--bg2); color: var(--accent); border-bottom: 2px solid var(--accent); }
+    .company-tab-content { padding: 8px; display: none; }
+    .company-tab-content.active { display: block; }
+    .company-textarea { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 11px; font-family: var(--font-mono); outline: none; resize: vertical; min-height: 80px; max-height: 200px; line-height: 1.6; }
+    .company-textarea:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
+    .company-hint { font-size: 10px; color: var(--dim); margin-top: 4px; line-height: 1.5; }
+    .company-actions { display: flex; gap: 4px; margin-top: 6px; }
+    .company-apply-btn { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
+    .company-apply-btn:hover { background: #2f4dd4; }
+    .company-clear-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
+    .company-clear-btn:hover { border-color: var(--red); color: var(--red); }
+    .company-count-badge { display: none; background: #eef1ff; border: 1px solid #d5d9f5; border-radius: 5px; padding: 3px 8px; font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 5px; align-items: center; gap: 6px; }
+    .company-count-badge.show { display: flex; }
+    .company-file-label { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; width: 100%; justify-content: center; margin-bottom: 6px; }
+    .company-file-label:hover { border-color: var(--accent); color: var(--accent); }
+    #company-file-input { display: none; }
 
     /* TOOLBAR */
     .toolbar { padding: 10px 16px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: var(--shadow); }
@@ -331,37 +399,87 @@
       </div>
     </div>
 
+    <!-- SENIORITY multi-select -->
     <div class="filter-group">
       <div class="filter-header">Seniority</div>
-      <select class="filter-select" id="f-seniority" onchange="applyFilters()"><option value="">All</option></select>
+      <div id="ms-seniority"></div>
     </div>
+
+    <!-- DEPARTMENT multi-select -->
     <div class="filter-group">
       <div class="filter-header">Department</div>
-      <select class="filter-select" id="f-department" onchange="applyFilters()"><option value="">All</option></select>
+      <div id="ms-department"></div>
     </div>
+
+    <!-- INDUSTRY multi-select -->
     <div class="filter-group">
       <div class="filter-header">Industry</div>
-      <select class="filter-select" id="f-industry" onchange="applyFilters()"><option value="">All</option></select>
+      <div id="ms-industry"></div>
     </div>
+
+    <!-- COUNTRY multi-select -->
     <div class="filter-group">
       <div class="filter-header">Country</div>
-      <select class="filter-select" id="f-country" onchange="applyFilters()"><option value="">All</option></select>
+      <div id="ms-country"></div>
     </div>
-    <div class="filter-group">
-      <div class="filter-header">Company</div>
-      <input class="filter-input" id="f-company" placeholder="Search company..." oninput="debounceFilter()"/>
-    </div>
+
+    <!-- CITY multi-select -->
     <div class="filter-group">
       <div class="filter-header">City</div>
-      <input class="filter-input" id="f-city" placeholder="Search city..." oninput="debounceFilter()"/>
+      <div id="ms-city"></div>
     </div>
+
+    <!-- JOB TITLE multi-select / search -->
     <div class="filter-group">
       <div class="filter-header">Job Title</div>
-      <input class="filter-input" id="f-jobtitle" placeholder="Search job title..." oninput="debounceFilter()"/>
+      <div id="ms-jobtitle"></div>
     </div>
+
+    <!-- RA NAME multi-select -->
     <div class="filter-group">
       <div class="filter-header">RA Name</div>
-      <select class="filter-select" id="f-ra" onchange="applyFilters()"><option value="">All</option></select>
+      <div id="ms-ra"></div>
+    </div>
+
+    <!-- COMPANY BULK FILTER -->
+    <div class="filter-group">
+      <div class="filter-header">Company / Domain</div>
+      <div class="company-filter-box">
+        <div class="company-tabs">
+          <button class="company-tab active" onclick="switchCompanyTab(this,'include')">Include</button>
+          <button class="company-tab" onclick="switchCompanyTab(this,'exclude')">Exclude</button>
+        </div>
+        <!-- Include tab -->
+        <div class="company-tab-content active" id="company-tab-include">
+          <label class="company-file-label" for="company-file-input-inc">
+            &#128196; Upload CSV/TXT
+          </label>
+          <input type="file" id="company-file-input-inc" accept=".csv,.txt" onchange="loadCompanyFile(this,'include')"/>
+          <textarea class="company-textarea" id="company-include-text"
+            placeholder="Paste company names or domains, one per line:&#10;Google&#10;apple.com&#10;Microsoft&#10;salesforce.com"></textarea>
+          <div class="company-hint">One name or domain per line. Domains like <em>example.com</em> will also match the Domain field.</div>
+          <div class="company-actions">
+            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply</button>
+            <button class="company-clear-btn" onclick="clearCompanyFilter()">Clear</button>
+          </div>
+          <div class="company-count-badge" id="company-inc-badge"></div>
+        </div>
+        <!-- Exclude tab -->
+        <div class="company-tab-content" id="company-tab-exclude">
+          <label class="company-file-label" for="company-file-input-exc">
+            &#128196; Upload CSV/TXT
+          </label>
+          <input type="file" id="company-file-input-exc" accept=".csv,.txt" onchange="loadCompanyFile(this,'exclude')"/>
+          <textarea class="company-textarea" id="company-exclude-text"
+            placeholder="Paste company names or domains to EXCLUDE:&#10;Competitor Inc&#10;badcompany.com"></textarea>
+          <div class="company-hint">These companies/domains will be excluded from results.</div>
+          <div class="company-actions">
+            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply</button>
+            <button class="company-clear-btn" onclick="clearCompanyFilter()">Clear</button>
+          </div>
+          <div class="company-count-badge" id="company-exc-badge"></div>
+        </div>
+      </div>
     </div>
 
     <div style="margin-top:auto;padding-top:14px;">
@@ -434,13 +552,29 @@
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
-const API_BASE = "https://quantyx-backend.onrender.com"; // <-- your Render URL
+const API_BASE = "https://quantyx-backend.onrender.com";
 // ─────────────────────────────────────────────────────────────────────────────
 
 let currentPage = 1, totalRecords = 0, totalPages = 1;
 let sortCol = "id", sortDir = "asc";
 let debounceTimer = null;
 const PER_PAGE = 50;
+
+// ── MULTI-SELECT STATE ────────────────────────────────────────────────────────
+// Each key: { options: [], selected: Set(), query: '' }
+const MS_FILTERS = {
+  seniority:  { param: 'seniority',  options: [], selected: new Set(), query: '' },
+  department: { param: 'department', options: [], selected: new Set(), query: '' },
+  industry:   { param: 'industry',   options: [], selected: new Set(), query: '' },
+  country:    { param: 'country',    options: [], selected: new Set(), query: '' },
+  city:       { param: 'city',       options: [], selected: new Set(), query: '' },
+  jobtitle:   { param: 'jobtitle',   options: [], selected: new Set(), query: '' },
+  ra:         { param: 'ra',         options: [], selected: new Set(), query: '' },
+};
+
+// Company filter state
+let companyInclude = [];   // parsed list
+let companyExclude = [];   // parsed list
 
 const COLUMNS = [
   { key:"First_Name",       label:"Name",            visible:true,  render:"name"  },
@@ -514,33 +648,250 @@ function clearDate(){
   applyFilters();
 }
 
+// ── MULTI-SELECT WIDGET ───────────────────────────────────────────────────────
+function buildMultiSelect(key) {
+  const container = document.getElementById(`ms-${key}`);
+  if (!container) return;
+  const state = MS_FILTERS[key];
+
+  container.innerHTML = `
+    <div class="ms-widget">
+      <div class="ms-trigger" id="ms-trigger-${key}" onclick="toggleMsDropdown('${key}')">
+        <span class="ms-trigger-label" id="ms-label-${key}">All</span>
+        <span class="ms-trigger-count" id="ms-count-${key}">0</span>
+        <span class="ms-chevron">▼</span>
+      </div>
+      <div class="ms-tags" id="ms-tags-${key}"></div>
+      <div class="ms-dropdown" id="ms-dropdown-${key}">
+        <div class="ms-search-wrap">
+          <input class="ms-search" id="ms-search-${key}" placeholder="Search..."
+            oninput="filterMsOptions('${key}', this.value)"
+            onclick="event.stopPropagation()"/>
+        </div>
+        <div class="ms-list" id="ms-list-${key}"></div>
+        <div class="ms-footer">
+          <span class="ms-footer-count" id="ms-footer-count-${key}"></span>
+          <span class="ms-clear-btn" onclick="clearMsFilter('${key}')">Clear</span>
+        </div>
+      </div>
+    </div>
+  `;
+  renderMsList(key);
+  updateMsTrigger(key);
+}
+
+function renderMsList(key) {
+  const state = MS_FILTERS[key];
+  const list = document.getElementById(`ms-list-${key}`);
+  const q = (state.query || '').toLowerCase();
+  const filtered = state.options.filter(o => o.toLowerCase().includes(q));
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="ms-empty">${state.options.length ? 'No matches' : 'Loading...'}</div>`;
+    document.getElementById(`ms-footer-count-${key}`).textContent = '';
+    return;
+  }
+  list.innerHTML = filtered.map(o => {
+    const sel = state.selected.has(o);
+    const id = `ms-cb-${key}-${o.replace(/\W/g,'_')}`;
+    return `<div class="ms-item${sel?' selected':''}" onclick="toggleMsItem('${key}', ${JSON.stringify(o)})">
+      <input type="checkbox" id="${id}" ${sel?'checked':''} onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})"/>
+      <label for="${id}" onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})">${esc(o)}</label>
+    </div>`;
+  }).join('');
+  document.getElementById(`ms-footer-count-${key}`).textContent =
+    `${filtered.length} of ${state.options.length}`;
+}
+
+function filterMsOptions(key, q) {
+  MS_FILTERS[key].query = q;
+  renderMsList(key);
+}
+
+function toggleMsDropdown(key) {
+  const dd = document.getElementById(`ms-dropdown-${key}`);
+  const trigger = document.getElementById(`ms-trigger-${key}`);
+  const isOpen = dd.classList.contains('open');
+
+  // Close all other dropdowns
+  Object.keys(MS_FILTERS).forEach(k => {
+    document.getElementById(`ms-dropdown-${k}`)?.classList.remove('open');
+    document.getElementById(`ms-trigger-${k}`)?.classList.remove('open');
+  });
+
+  if (!isOpen) {
+    dd.classList.add('open');
+    trigger.classList.add('open');
+    setTimeout(() => document.getElementById(`ms-search-${key}`)?.focus(), 50);
+  }
+}
+
+function toggleMsItem(key, value) {
+  const state = MS_FILTERS[key];
+  if (state.selected.has(value)) {
+    state.selected.delete(value);
+  } else {
+    state.selected.add(value);
+  }
+  renderMsList(key);
+  updateMsTrigger(key);
+  applyFilters();
+}
+
+function updateMsTrigger(key) {
+  const state = MS_FILTERS[key];
+  const count = state.selected.size;
+  const label = document.getElementById(`ms-label-${key}`);
+  const countEl = document.getElementById(`ms-count-${key}`);
+  const trigger = document.getElementById(`ms-trigger-${key}`);
+  const tagsEl = document.getElementById(`ms-tags-${key}`);
+
+  if (count === 0) {
+    label.textContent = 'All';
+    countEl.classList.remove('show');
+    trigger.classList.remove('active');
+    tagsEl.innerHTML = '';
+  } else {
+    label.textContent = count === 1 ? [...state.selected][0] : `${count} selected`;
+    countEl.textContent = count;
+    countEl.classList.add('show');
+    trigger.classList.add('active');
+    // Render tags
+    tagsEl.innerHTML = [...state.selected].map(v =>
+      `<div class="ms-tag">
+        <span title="${esc(v)}">${esc(v.length > 18 ? v.slice(0,16)+'…' : v)}</span>
+        <span class="ms-tag-x" onclick="removeMsTag('${key}',${JSON.stringify(v)})">×</span>
+      </div>`
+    ).join('');
+  }
+}
+
+function removeMsTag(key, value) {
+  MS_FILTERS[key].selected.delete(value);
+  renderMsList(key);
+  updateMsTrigger(key);
+  applyFilters();
+}
+
+function clearMsFilter(key) {
+  MS_FILTERS[key].selected.clear();
+  MS_FILTERS[key].query = '';
+  const s = document.getElementById(`ms-search-${key}`);
+  if (s) s.value = '';
+  renderMsList(key);
+  updateMsTrigger(key);
+  applyFilters();
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ms-widget')) {
+    Object.keys(MS_FILTERS).forEach(k => {
+      document.getElementById(`ms-dropdown-${k}`)?.classList.remove('open');
+      document.getElementById(`ms-trigger-${k}`)?.classList.remove('open');
+    });
+  }
+  if (!e.target.closest('.cols-dropdown')) {
+    document.getElementById('cols-menu').classList.remove('open');
+  }
+});
+
+// ── COMPANY FILTER ────────────────────────────────────────────────────────────
+function switchCompanyTab(btn, tab) {
+  document.querySelectorAll('.company-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.company-tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`company-tab-${tab}`).classList.add('active');
+}
+
+function parseCompanyText(text) {
+  return text.split('\n')
+    .map(l => l.trim().replace(/,+$/, '').trim())
+    .filter(Boolean);
+}
+
+function loadCompanyFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    // Parse CSV: grab first column values
+    const lines = text.split('\n').map(l => l.split(',')[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
+    const textareaId = type === 'include' ? 'company-include-text' : 'company-exclude-text';
+    const existing = document.getElementById(textareaId).value.trim();
+    document.getElementById(textareaId).value = (existing ? existing + '\n' : '') + lines.join('\n');
+    showToast(`Loaded ${lines.length} entries from file`);
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function applyCompanyFilter() {
+  const incText = document.getElementById('company-include-text').value;
+  const excText = document.getElementById('company-exclude-text').value;
+  companyInclude = parseCompanyText(incText);
+  companyExclude = parseCompanyText(excText);
+
+  const incBadge = document.getElementById('company-inc-badge');
+  const excBadge = document.getElementById('company-exc-badge');
+
+  if (companyInclude.length) {
+    incBadge.innerHTML = `&#10003; ${companyInclude.length} include entries active <span style="cursor:pointer;color:var(--red);margin-left:6px;" onclick="clearCompanyInclude()">×</span>`;
+    incBadge.classList.add('show');
+  } else {
+    incBadge.classList.remove('show');
+  }
+  if (companyExclude.length) {
+    excBadge.innerHTML = `&#10003; ${companyExclude.length} exclude entries active <span style="cursor:pointer;color:var(--red);margin-left:6px;" onclick="clearCompanyExclude()">×</span>`;
+    excBadge.classList.add('show');
+  } else {
+    excBadge.classList.remove('show');
+  }
+
+  applyFilters();
+}
+
+function clearCompanyInclude() {
+  document.getElementById('company-include-text').value = '';
+  companyInclude = [];
+  document.getElementById('company-inc-badge').classList.remove('show');
+  applyFilters();
+}
+function clearCompanyExclude() {
+  document.getElementById('company-exclude-text').value = '';
+  companyExclude = [];
+  document.getElementById('company-exc-badge').classList.remove('show');
+  applyFilters();
+}
+function clearCompanyFilter() {
+  clearCompanyInclude();
+  clearCompanyExclude();
+}
+
 // ── BUILD PARAMS ──────────────────────────────────────────────────────────────
 function buildParams(page){
   const p = new URLSearchParams();
   p.set('page', page||1);
   p.set('limit', PER_PAGE);
-  const search   = document.getElementById('search').value.trim();
-  const senior   = document.getElementById('f-seniority').value;
-  const dept     = document.getElementById('f-department').value;
-  const ind      = document.getElementById('f-industry').value;
-  const country  = document.getElementById('f-country').value;
-  const company  = document.getElementById('f-company').value.trim();
-  const city     = document.getElementById('f-city').value.trim();
-  const jobtitle = document.getElementById('f-jobtitle').value.trim();
-  const ra       = document.getElementById('f-ra').value;
-  const dFrom    = document.getElementById('f-date-from').value;
-  const dTo      = document.getElementById('f-date-to').value;
-  if(search)   p.set('search',   search);
-  if(senior)   p.set('seniority',senior);
-  if(dept)     p.set('department',dept);
-  if(ind)      p.set('industry', ind);
-  if(country)  p.set('country',  country);
-  if(company)  p.set('company',  company);
-  if(city)     p.set('city',     city);
-  if(jobtitle) p.set('jobtitle', jobtitle);
-  if(ra)       p.set('ra',       ra);
-  if(dFrom)    p.set('dateFrom', dFrom);
-  if(dTo)      p.set('dateTo',   dTo);
+  const search  = document.getElementById('search').value.trim();
+  const dFrom   = document.getElementById('f-date-from').value;
+  const dTo     = document.getElementById('f-date-to').value;
+  if(search)  p.set('search',   search);
+  if(dFrom)   p.set('dateFrom', dFrom);
+  if(dTo)     p.set('dateTo',   dTo);
+
+  // Multi-selects
+  Object.entries(MS_FILTERS).forEach(([key, state]) => {
+    if (state.selected.size > 0) {
+      p.set(state.param, [...state.selected].join('||'));
+    }
+  });
+
+  // Company include/exclude
+  if (companyInclude.length) p.set('company', companyInclude.join('||'));
+  if (companyExclude.length) p.set('companyExclude', companyExclude.join('||'));
+
   p.set('sortCol', sortCol);
   p.set('sortDir', sortDir);
   return p;
@@ -578,18 +929,20 @@ async function loadFilters(){
     const res = await fetch(`${API_BASE}/filters`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
-    populateSelect('f-seniority',  f.seniority  ||[]);
-    populateSelect('f-department', f.department ||[]);
-    populateSelect('f-industry',   f.industry   ||[]);
-    populateSelect('f-country',    f.country    ||[]);
-    populateSelect('f-ra',         f.ra         ||[]);
-  } catch(err){ console.error('Filters error:',err); }
-}
 
-function populateSelect(id, vals){
-  const sel=document.getElementById(id), cur=sel.value;
-  sel.innerHTML='<option value="">All</option>'+vals.map(v=>`<option value="${esc(v)}">${v}</option>`).join('');
-  if(cur) sel.value=cur;
+    // Populate multi-select options
+    MS_FILTERS.seniority.options  = f.seniority  || [];
+    MS_FILTERS.department.options = f.department || [];
+    MS_FILTERS.industry.options   = f.industry   || [];
+    MS_FILTERS.country.options    = f.country    || [];
+    MS_FILTERS.city.options       = f.city       || [];
+    MS_FILTERS.ra.options         = f.ra         || [];
+    // Job title: use free-text search, no predefined list (leave empty)
+    MS_FILTERS.jobtitle.options   = [];
+
+    // Build all multi-select widgets
+    Object.keys(MS_FILTERS).forEach(k => buildMultiSelect(k));
+  } catch(err){ console.error('Filters error:',err); }
 }
 
 async function fetchPage(page){
@@ -605,7 +958,7 @@ async function fetchPage(page){
     const dFrom=document.getElementById('f-date-from').value;
     const dTo  =document.getElementById('f-date-to').value;
     const badge=document.getElementById('date-badge');
-    if(dFrom||dTo){ badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} -> ${dTo||'any'}`; }
+    if(dFrom||dTo){ badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} → ${dTo||'any'}`; }
     else { badge.classList.remove('show'); }
 
     document.getElementById('result-num').textContent   = totalRecords.toLocaleString();
@@ -623,9 +976,24 @@ function applyFilters(){ fetchPage(1); }
 function debounceFilter(){ clearTimeout(debounceTimer); debounceTimer=setTimeout(()=>applyFilters(),400); }
 
 function clearFilters(){
-  ['f-seniority','f-department','f-industry','f-country','f-ra'].forEach(id=>document.getElementById(id).value='');
-  ['f-company','f-city','f-jobtitle','search','f-date-from','f-date-to'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('search').value='';
+  document.getElementById('f-date-from').value='';
+  document.getElementById('f-date-to').value='';
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  Object.keys(MS_FILTERS).forEach(k => {
+    MS_FILTERS[k].selected.clear();
+    MS_FILTERS[k].query = '';
+    const s = document.getElementById(`ms-search-${k}`);
+    if (s) s.value = '';
+    renderMsList(k);
+    updateMsTrigger(k);
+  });
+  document.getElementById('company-include-text').value = '';
+  document.getElementById('company-exclude-text').value = '';
+  companyInclude = [];
+  companyExclude = [];
+  document.getElementById('company-inc-badge').classList.remove('show');
+  document.getElementById('company-exc-badge').classList.remove('show');
   applyFilters();
 }
 
@@ -745,7 +1113,7 @@ function dlSetIcon(mode){
   document.getElementById('dl-svg-ok' ).style.display = mode==='ok'    ?'':'none';
   document.getElementById('dl-svg-err').style.display = mode==='error' ?'':'none';
   const icon = document.getElementById('dl-icon');
-  icon.className = 'dl-icon' + (mode==='ok'?'  done':mode==='error'?' error':'');
+  icon.className = 'dl-icon' + (mode==='ok'?' done':mode==='error'?' error':'');
 }
 
 function showDlBar(title, sub){
@@ -807,21 +1175,17 @@ async function exportCSV(){
   showDlBar(filename, 'Getting row count...');
 
   try {
-    // Step 1 — get exact total rows (fast, uses index)
     const countRes = await fetch(`${API_BASE}/export-count?${params}`);
     if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
     const { total: totalRows } = await countRes.json();
     updateDlBar(2, `${totalRows.toLocaleString()} rows to download`, 0);
 
-    // Step 2 — stream CSV from backend
     const res = await fetch(`${API_BASE}/export?${params}`);
     if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
 
-    // Read X-Total-Rows header set by backend
     const headerRows = parseInt(res.headers.get('X-Total-Rows')||'0') || totalRows;
 
     if(!res.body){
-      // Fallback: no streaming API (old browsers)
       updateDlBar(50, 'Downloading...');
       const blob = await res.blob();
       const a = document.createElement('a');
@@ -830,7 +1194,6 @@ async function exportCSV(){
       return;
     }
 
-    // Stream and count rows in real time
     const reader   = res.body.getReader();
     const decoder  = new TextDecoder();
     const chunks   = [];
@@ -843,14 +1206,11 @@ async function exportCSV(){
       if(done) break;
       chunks.push(value);
       bytesTotal += value.length;
-
-      // Count newlines to track rows received
       const text = decoder.decode(value, { stream: true });
       partial += text;
       const lines = partial.split('\n');
       rowCount += lines.length - 1;
       partial = lines[lines.length - 1];
-
       const pct = headerRows > 0
         ? Math.min(97, Math.round(2 + (rowCount / headerRows) * 95))
         : Math.min(97, Math.round(bytesTotal / 1024 / 60));
@@ -858,7 +1218,6 @@ async function exportCSV(){
       updateDlBar(pct, `${mb} MB downloaded`, Math.max(0, rowCount - 1));
     }
 
-    // Finalize and trigger download
     updateDlBar(98, 'Saving file...');
     const blob = new Blob(chunks, { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
@@ -889,9 +1248,6 @@ function buildColsMenu(){
 }
 function toggleCol(i){ COLUMNS[i].visible=!COLUMNS[i].visible; buildColsMenu(); fetchPage(currentPage); }
 function toggleColsMenu(){ document.getElementById('cols-menu').classList.toggle('open'); }
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.cols-dropdown')) document.getElementById('cols-menu').classList.remove('open');
-});
 
 loadData();
 </script>
