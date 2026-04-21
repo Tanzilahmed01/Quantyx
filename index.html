@@ -1234,6 +1234,10 @@ function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();fet
 function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
 
 loadData();
+  function applyFilters() {
+  console.log("Filters triggered");
+  fetchPage(1);
+}
 </script>
 </body>
 </html>
