@@ -71,12 +71,13 @@
     .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
-    /* MULTI-SELECT FILTER */
+    /* ── MULTI-SELECT FILTER ── */
     .filter-group { margin-bottom: 6px; }
     .filter-header { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; padding: 8px 2px 4px; }
 
     .ms-widget { position: relative; }
 
+    /* Trigger button */
     .ms-trigger {
       width: 100%; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui);
@@ -91,12 +92,14 @@
     .ms-chevron { color: var(--dim); font-size: 9px; flex-shrink: 0; transition: transform 0.15s; }
     .ms-trigger.open .ms-chevron { transform: rotate(180deg); }
 
+    /* Selected tags row */
     .ms-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
     .ms-tag { display: inline-flex; align-items: center; gap: 3px; background: #eef1ff; color: var(--accent); border: 1px solid #cdd4f8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 500; max-width: 100%; }
     .ms-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
     .ms-tag-x { cursor: pointer; font-size: 12px; line-height: 1; flex-shrink: 0; opacity: 0.6; }
     .ms-tag-x:hover { opacity: 1; color: var(--red); }
 
+    /* Floating dropdown */
     .ms-dropdown {
       position: absolute; left: 0; right: 0; top: calc(100% + 4px);
       z-index: 500;
@@ -121,7 +124,7 @@
     .ms-clear-btn { font-size: 11px; color: var(--red); cursor: pointer; font-weight: 600; }
     .ms-clear-btn:hover { text-decoration: underline; }
 
-    /* JOB TITLE TAG INPUT */
+    /* ── JOB TITLE TAG INPUT ── */
     .tag-input-wrap {
       background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
@@ -133,7 +136,7 @@
     .tag-real-input::placeholder { color: var(--dim); }
     .tag-hint { font-size: 10px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
 
-    /* COMPANY FILTER */
+    /* ── COMPANY FILTER ── */
     .company-filter-box { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
     .company-tabs { display: flex; border-bottom: 1px solid var(--border); }
     .company-tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; border: none; font-family: var(--font-ui); border-bottom: 2px solid transparent; }
@@ -184,9 +187,6 @@
     .table th { background: var(--bg3); color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s; }
     .table th:hover { color: var(--accent); }
     .table th.sorted { color: var(--accent); }
-    /* Checkbox th should not show sort hover */
-    .table th.no-sort { cursor: default; }
-    .table th.no-sort:hover { color: var(--muted); }
     .sort-icon { opacity: 0.4; margin-left: 4px; }
     .table th.sorted .sort-icon { opacity: 1; }
     .table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; max-width: 190px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -287,11 +287,6 @@
     .dl-rows { font-size: 10px; color: var(--dim); font-family: var(--font-mono); }
     .dl-close { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.15s; flex-shrink: 0; }
     .dl-close:hover { background: var(--bg3); color: var(--text); }
-
-    /* Checkbox column — no pointer events leak */
-    .cb-th { width: 32px; cursor: default !important; }
-    .cb-td { width: 32px; }
-    .cb-th:hover { color: var(--muted) !important; }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -439,7 +434,7 @@
       <div id="ms-city"></div>
     </div>
 
-    <!-- JOB TITLE — tag input -->
+    <!-- JOB TITLE — tag input (type + Enter) -->
     <div class="filter-group">
       <div class="filter-header">Job Title</div>
       <div class="tag-input-wrap" id="jobtitle-wrap" onclick="document.getElementById('jobtitle-input').focus()">
@@ -556,6 +551,689 @@
   <button class="dl-close" onclick="hideDlBar()">&#x2715;</button>
 </div>
 
-<script src="app.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const API_BASE = "https://quantyx-backend.onrender.com";
+// ─────────────────────────────────────────────────────────────────────────────
+
+let currentPage = 1, totalRecords = 0, totalPages = 1;
+let sortCol = "id", sortDir = "asc";
+let debounceTimer = null;
+const PER_PAGE = 50;
+
+// ── MULTI-SELECT STATE ────────────────────────────────────────────────────────
+// key → { param: string, options: string[], selected: Set }
+const MS = {
+  seniority:  { param: 'seniority',  options: [], selected: new Set() },
+  department: { param: 'department', options: [], selected: new Set() },
+  industry:   { param: 'industry',   options: [], selected: new Set() },
+  country:    { param: 'country',    options: [], selected: new Set() },
+  city:       { param: 'city',       options: [], selected: new Set() },
+  ra:         { param: 'ra',         options: [], selected: new Set() },
+};
+
+// Job title tags (free-text, multi)
+let jobTitleTags = new Set();
+
+// Company filter state
+let companyInclude = [];
+let companyExclude = [];
+
+const COLUMNS = [
+  { key:"First_Name",       label:"Name",            visible:true,  render:"name"  },
+  { key:"Company_Name",     label:"Company",         visible:true,  render:"text"  },
+  { key:"Job_Title",        label:"Job Title",       visible:true,  render:"text"  },
+  { key:"Email_ID_ABM",     label:"Email (ABM)",     visible:true,  render:"email" },
+  { key:"Email_ID_Finding", label:"Email (Finding)", visible:false, render:"email" },
+  { key:"Department",       label:"Department",      visible:true,  render:"pill"  },
+  { key:"Seniority",        label:"Seniority",       visible:true,  render:"pill"  },
+  { key:"Industry",         label:"Industry",        visible:true,  render:"text"  },
+  { key:"Telephone_No",     label:"Phone",           visible:false, render:"text"  },
+  { key:"City",             label:"City",            visible:true,  render:"text"  },
+  { key:"Country",          label:"Country",         visible:true,  render:"text"  },
+  { key:"Emp_Size",         label:"Emp Size",        visible:false, render:"text"  },
+  { key:"Revenue",          label:"Revenue",         visible:false, render:"text"  },
+  { key:"Date",             label:"Date Added",      visible:true,  render:"date"  },
+  { key:"RA_Name",          label:"RA Name",         visible:false, render:"text"  },
+  { key:"Campaign_Name",    label:"Campaign",        visible:false, render:"text"  },
+];
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function pad(n){ return String(n).padStart(2,'0'); }
+function updateClock(){
+  const now = new Date();
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('clock-time').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  document.getElementById('clock-date').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── AVATAR PALETTE ────────────────────────────────────────────────────────────
+const PALETTES = [
+  {bg:'#eef1ff',c:'#4361ee'},{bg:'#e8faf2',c:'#0ead69'},
+  {bg:'#f3e8ff',c:'#7209b7'},{bg:'#fff8e6',c:'#b77800'},
+  {bg:'#fff0f3',c:'#e63757'},{bg:'#e8f6ff',c:'#0077b6'},
+];
+function pal(name){ return PALETTES[[...(name||'X')].reduce((a,c)=>a+c.charCodeAt(0),0)%PALETTES.length]; }
+
+// ── DATE HELPERS ──────────────────────────────────────────────────────────────
+function toYMD(d){ return d.toISOString().slice(0,10); }
+function fmtDate(val){
+  if(!val) return null;
+  const d = new Date(val); if(isNaN(d)) return {main:val,ago:''};
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const main = `${pad(d.getDate())} ${M[d.getMonth()]} ${d.getFullYear()}`;
+  const diff = Math.floor((Date.now()-d)/86400000);
+  const ago = diff===0?'Today':diff===1?'Yesterday':diff<30?`${diff}d ago`:diff<365?`${Math.floor(diff/30)}mo ago`:`${Math.floor(diff/365)}y ago`;
+  return {main, ago};
+}
+
+// ── DATE PRESETS ──────────────────────────────────────────────────────────────
+function setPreset(btn, p){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const now = new Date(); let from, to = toYMD(now);
+  if      (p==='today')     { from = to; }
+  else if (p==='7d')        { const d=new Date(now); d.setDate(d.getDate()-7);  from=toYMD(d); }
+  else if (p==='30d')       { const d=new Date(now); d.setDate(d.getDate()-30); from=toYMD(d); }
+  else if (p==='90d')       { const d=new Date(now); d.setDate(d.getDate()-90); from=toYMD(d); }
+  else if (p==='thismonth') { from=toYMD(new Date(now.getFullYear(),now.getMonth(),1)); }
+  else if (p==='lastmonth') { from=toYMD(new Date(now.getFullYear(),now.getMonth()-1,1)); to=toYMD(new Date(now.getFullYear(),now.getMonth(),0)); }
+  document.getElementById('f-date-from').value = from;
+  document.getElementById('f-date-to').value   = to;
+  applyFilters();
+}
+function clearDate(){
+  document.getElementById('f-date-from').value = '';
+  document.getElementById('f-date-to').value   = '';
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  applyFilters();
+}
+
+// ── MULTI-SELECT WIDGET ───────────────────────────────────────────────────────
+function buildMultiSelect(key) {
+  const container = document.getElementById(`ms-${key}`);
+  if (!container) return;
+  container.innerHTML = `
+    <div class="ms-widget" id="msw-${key}">
+      <div class="ms-trigger" id="mst-${key}" onclick="toggleMs('${key}')">
+        <div class="ms-trigger-left">
+          <span class="ms-trigger-label" id="mslabel-${key}">All</span>
+          <span class="ms-count-pill" id="mscount-${key}" style="display:none"></span>
+        </div>
+        <span class="ms-chevron">▼</span>
+      </div>
+      <div class="ms-tags" id="mstags-${key}"></div>
+      <div class="ms-dropdown" id="msdd-${key}">
+        <div class="ms-search-wrap">
+          <input class="ms-search" id="mssearch-${key}" placeholder="Search ${key}..."
+            oninput="renderMsList('${key}',this.value)" onclick="event.stopPropagation()"/>
+        </div>
+        <div class="ms-list" id="mslist-${key}"></div>
+        <div class="ms-footer">
+          <span class="ms-footer-count" id="msfc-${key}"></span>
+          <span class="ms-clear-btn" onclick="clearMs('${key}')">Clear all</span>
+        </div>
+      </div>
+    </div>`;
+  renderMsList(key, '');
+  refreshMsTrigger(key);
+}
+
+function renderMsList(key, q) {
+  q = (q||'').toLowerCase().trim();
+  const state = MS[key];
+  const filtered = state.options.filter(o => !q || o.toLowerCase().includes(q));
+  const list = document.getElementById(`mslist-${key}`);
+  if (!filtered.length) {
+    list.innerHTML = `<div class="ms-empty">${state.options.length===0?'Loading…':'No matches'}</div>`;
+    document.getElementById(`msfc-${key}`).textContent = '';
+    return;
+  }
+  list.innerHTML = filtered.map(o => {
+    const sel = state.selected.has(o);
+    const safeId = `mscb-${key}-${CSS.escape(o)}`;
+    return `<div class="ms-item${sel?' selected':''}" onclick="toggleMsItem('${key}',${JSON.stringify(o)})">
+      <input type="checkbox" id="${safeId}" ${sel?'checked':''} onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})"/>
+      <span class="ms-item-label" title="${esc(o)}">${esc(o)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById(`msfc-${key}`).textContent = `${filtered.length}/${state.options.length}`;
+}
+
+function toggleMs(key) {
+  const dd = document.getElementById(`msdd-${key}`);
+  const trigger = document.getElementById(`mst-${key}`);
+  const isOpen = dd.classList.contains('open');
+  // Close all
+  Object.keys(MS).forEach(k => {
+    document.getElementById(`msdd-${k}`)?.classList.remove('open');
+    document.getElementById(`mst-${k}`)?.classList.remove('open');
+  });
+  if (!isOpen) {
+    dd.classList.add('open');
+    trigger.classList.add('open');
+    const s = document.getElementById(`mssearch-${key}`);
+    if (s) { s.value = ''; renderMsList(key,''); setTimeout(()=>s.focus(),30); }
+  }
+}
+
+function toggleMsItem(key, value) {
+  const state = MS[key];
+  if (state.selected.has(value)) state.selected.delete(value);
+  else state.selected.add(value);
+  // Re-render list preserving current search
+  const q = document.getElementById(`mssearch-${key}`)?.value || '';
+  renderMsList(key, q);
+  refreshMsTrigger(key);
+  applyFilters();
+}
+
+function refreshMsTrigger(key) {
+  const state = MS[key];
+  const count = state.selected.size;
+  const label = document.getElementById(`mslabel-${key}`);
+  const pill  = document.getElementById(`mscount-${key}`);
+  const trigger = document.getElementById(`mst-${key}`);
+  const tags  = document.getElementById(`mstags-${key}`);
+
+  if (count === 0) {
+    label.textContent = 'All';
+    label.className = 'ms-trigger-label';
+    pill.style.display = 'none';
+    trigger.classList.remove('active');
+    tags.innerHTML = '';
+  } else {
+    label.textContent = count === 1 ? [...state.selected][0] : `${count} selected`;
+    label.className = 'ms-trigger-label has-value';
+    pill.textContent = count;
+    pill.style.display = 'inline-block';
+    trigger.classList.add('active');
+    tags.innerHTML = [...state.selected].map(v =>
+      `<div class="ms-tag">
+        <span title="${esc(v)}">${esc(v.length>20 ? v.slice(0,18)+'…' : v)}</span>
+        <span class="ms-tag-x" onclick="event.stopPropagation();removeMsTag('${key}',${JSON.stringify(v)})">×</span>
+      </div>`
+    ).join('');
+  }
+}
+
+function removeMsTag(key, value) {
+  MS[key].selected.delete(value);
+  const q = document.getElementById(`mssearch-${key}`)?.value || '';
+  renderMsList(key, q);
+  refreshMsTrigger(key);
+  applyFilters();
+}
+
+function clearMs(key) {
+  MS[key].selected.clear();
+  const s = document.getElementById(`mssearch-${key}`);
+  if (s) { s.value = ''; }
+  renderMsList(key, '');
+  refreshMsTrigger(key);
+  applyFilters();
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ms-widget')) {
+    Object.keys(MS).forEach(k => {
+      document.getElementById(`msdd-${k}`)?.classList.remove('open');
+      document.getElementById(`mst-${k}`)?.classList.remove('open');
+    });
+  }
+  if (!e.target.closest('.cols-dropdown')) {
+    document.getElementById('cols-menu')?.classList.remove('open');
+  }
+});
+
+// ── JOB TITLE TAG INPUT ───────────────────────────────────────────────────────
+function handleJobTitleKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (val && !jobTitleTags.has(val)) {
+      jobTitleTags.add(val);
+      renderJobTitleTags();
+      applyFilters();
+    }
+    e.target.value = '';
+    e.target.size = 8;
+  } else if (e.key === 'Backspace' && e.target.value === '' && jobTitleTags.size > 0) {
+    const last = [...jobTitleTags].pop();
+    jobTitleTags.delete(last);
+    renderJobTitleTags();
+    applyFilters();
+  }
+}
+
+function renderJobTitleTags() {
+  const wrap = document.getElementById('jobtitle-wrap');
+  const input = document.getElementById('jobtitle-input');
+  // Remove old tags but keep input
+  wrap.querySelectorAll('.ms-tag').forEach(t => t.remove());
+  [...jobTitleTags].forEach(v => {
+    const tag = document.createElement('div');
+    tag.className = 'ms-tag';
+    tag.innerHTML = `<span title="${esc(v)}">${esc(v.length>18?v.slice(0,16)+'…':v)}</span><span class="ms-tag-x" onclick="removeJobTag(${JSON.stringify(v)})">×</span>`;
+    wrap.insertBefore(tag, input);
+  });
+}
+
+function removeJobTag(v) {
+  jobTitleTags.delete(v);
+  renderJobTitleTags();
+  applyFilters();
+}
+
+// ── COMPANY FILTER ────────────────────────────────────────────────────────────
+function switchCompanyTab(btn, tab) {
+  document.querySelectorAll('.company-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.company-tab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`company-tab-${tab}`).classList.add('active');
+}
+
+function parseCompanyText(text) {
+  return [...new Set(
+    text.split('\n')
+      .map(l => l.trim().replace(/,+$/, '').trim())
+      .filter(Boolean)
+  )];
+}
+
+function loadCompanyFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result
+      .split('\n')
+      .map(l => l.split(',')[0].replace(/^"|"$/g,'').trim())
+      .filter(Boolean);
+    const tid = type==='include' ? 'company-include-text' : 'company-exclude-text';
+    const existing = document.getElementById(tid).value.trim();
+    document.getElementById(tid).value = (existing?existing+'\n':'')+lines.join('\n');
+    showToast(`Loaded ${lines.length} entries from file`);
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function applyCompanyFilter() {
+  companyInclude = parseCompanyText(document.getElementById('company-include-text').value);
+  companyExclude = parseCompanyText(document.getElementById('company-exclude-text').value);
+  const ib = document.getElementById('company-inc-badge');
+  const eb = document.getElementById('company-exc-badge');
+  if (companyInclude.length) {
+    ib.innerHTML = `✓ ${companyInclude.length} include entries active <span style="cursor:pointer;margin-left:6px;color:var(--red)" onclick="clearCompanyFilter('include')">×</span>`;
+    ib.classList.add('show');
+  } else { ib.classList.remove('show'); }
+  if (companyExclude.length) {
+    eb.innerHTML = `✓ ${companyExclude.length} exclude entries active <span style="cursor:pointer;margin-left:6px;color:var(--red)" onclick="clearCompanyFilter('exclude')">×</span>`;
+    eb.classList.add('show');
+  } else { eb.classList.remove('show'); }
+  applyFilters();
+}
+
+function clearCompanyFilter(type) {
+  if (!type || type==='include') {
+    document.getElementById('company-include-text').value = '';
+    companyInclude = [];
+    document.getElementById('company-inc-badge').classList.remove('show');
+  }
+  if (!type || type==='exclude') {
+    document.getElementById('company-exclude-text').value = '';
+    companyExclude = [];
+    document.getElementById('company-exc-badge').classList.remove('show');
+  }
+  applyFilters();
+}
+
+// ── BUILD PARAMS ──────────────────────────────────────────────────────────────
+function buildParams(page) {
+  const p = new URLSearchParams();
+  p.set('page',  page || 1);
+  p.set('limit', PER_PAGE);
+
+  const search = document.getElementById('search').value.trim();
+  const dFrom  = document.getElementById('f-date-from').value;
+  const dTo    = document.getElementById('f-date-to').value;
+  if (search) p.set('search',   search);
+  if (dFrom)  p.set('dateFrom', dFrom);
+  if (dTo)    p.set('dateTo',   dTo);
+
+  // Multi-selects — send as pipe-separated values
+  Object.entries(MS).forEach(([key, state]) => {
+    if (state.selected.size > 0) {
+      p.set(state.param, [...state.selected].join('||'));
+    }
+  });
+
+  // Job title tags
+  if (jobTitleTags.size > 0) {
+    p.set('jobtitle', [...jobTitleTags].join('||'));
+  }
+
+  // Company include / exclude
+  if (companyInclude.length) p.set('company',        companyInclude.join('||'));
+  if (companyExclude.length) p.set('companyExclude', companyExclude.join('||'));
+
+  p.set('sortCol', sortCol);
+  p.set('sortDir', sortDir);
+  return p;
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  await Promise.all([loadStats(), loadFilters()]);
+  buildColsMenu();
+  await fetchPage(1);
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const s = await res.json();
+    document.getElementById('s-total').textContent      = (s.total||0).toLocaleString();
+    document.getElementById('s-companies').textContent  = (s.uniqueCompanies||0).toLocaleString();
+    document.getElementById('s-countries').textContent  = (s.uniqueCountries||0).toLocaleString();
+    document.getElementById('s-industries').textContent = (s.uniqueIndustries||0).toLocaleString();
+    document.getElementById('nav-total').textContent    = (s.total||0).toLocaleString();
+    const now = new Date(), M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('s-updated').textContent = `${now.getDate()} ${M[now.getMonth()]}`;
+    document.getElementById('s-time').textContent    = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.getElementById('backend-status').textContent = 'Live';
+  } catch(err) {
+    console.error('Stats error:', err);
+    document.getElementById('backend-status').textContent = 'Error';
+  }
+}
+
+async function loadFilters() {
+  try {
+    const res = await fetch(`${API_BASE}/filters`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const f = await res.json();
+
+    MS.seniority.options  = f.seniority  || [];
+    MS.department.options = f.department || [];
+    MS.industry.options   = f.industry   || [];
+    MS.country.options    = f.country    || [];
+    MS.city.options       = f.city       || [];
+    MS.ra.options         = f.ra         || [];
+
+    Object.keys(MS).forEach(k => buildMultiSelect(k));
+  } catch(err) { console.error('Filters error:', err); }
+}
+
+async function fetchPage(page) {
+  currentPage = page;
+  document.getElementById('table-wrap').innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
+  try {
+    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`);
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || `HTTP ${res.status}`); }
+    const json = await res.json();
+    totalRecords = json.total || 0;
+    totalPages   = json.totalPages || Math.ceil(totalRecords/PER_PAGE);
+
+    const dFrom = document.getElementById('f-date-from').value;
+    const dTo   = document.getElementById('f-date-to').value;
+    const badge = document.getElementById('date-badge');
+    if (dFrom||dTo) { badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} → ${dTo||'any'}`; }
+    else { badge.classList.remove('show'); }
+
+    document.getElementById('result-num').textContent   = totalRecords.toLocaleString();
+    document.getElementById('result-total').textContent = totalRecords.toLocaleString();
+    document.getElementById('nav-filtered').textContent = totalRecords.toLocaleString();
+    renderTable(json.data||[], (page-1)*PER_PAGE);
+    renderPagination();
+  } catch(err) {
+    console.error('Fetch error:', err);
+    document.getElementById('table-wrap').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
+  }
+}
+
+function applyFilters() { fetchPage(1); }
+function debounceFilter() { clearTimeout(debounceTimer); debounceTimer = setTimeout(()=>applyFilters(), 400); }
+
+function clearAllFilters() {
+  document.getElementById('search').value = '';
+  document.getElementById('f-date-from').value = '';
+  document.getElementById('f-date-to').value   = '';
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  Object.keys(MS).forEach(k => {
+    MS[k].selected.clear();
+    const s = document.getElementById(`mssearch-${k}`);
+    if (s) s.value = '';
+    renderMsList(k,'');
+    refreshMsTrigger(k);
+  });
+  jobTitleTags.clear();
+  renderJobTitleTags();
+  document.getElementById('jobtitle-input').value = '';
+  clearCompanyFilter();
+  applyFilters();
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────────────────
+function renderTable(rows, offset) {
+  const vis = COLUMNS.filter(c=>c.visible);
+  if (!rows.length) {
+    document.getElementById('table-wrap').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>No contacts match your filters.</div>';
+    return;
+  }
+
+  // ━━━ FIX 1 ━━━ Header checkbox: stop propagation on <th> AND on <input>
+  const thead = `<tr>
+    <th style="width:44px;">#</th>
+    <th style="width:32px;cursor:default;" onclick="event.stopPropagation()"><input type="checkbox" onchange="toggleAll(this)" onclick="event.stopPropagation()"/></th>
+    ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`).join('')}
+    <th style="width:68px;"></th>
+  </tr>`;
+
+  // ━━━ FIX 2 ━━━ Row checkbox: add onclick stopPropagation on <input> + class="row-cb"
+  const tbody = rows.map((row,i)=>`
+    <tr onclick="openDetail(${row.id})" style="cursor:pointer">
+      <td><span class="row-num">${String(offset+i+1).padStart(4,'0')}</span></td>
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onclick="event.stopPropagation()"/></td>
+      ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
+      <td><div class="row-actions">
+        <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
+        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.Email_ID_ABM||row.Email_ID_Finding||'')}','Email copied!')">⌘</div>
+      </div></td>
+    </tr>`).join('');
+  document.getElementById('table-wrap').innerHTML = `<table class="table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+}
+
+function renderCell(col, row) {
+  const val = row[col.key]||'', dash = `<span style="color:var(--dim)">—</span>`;
+  if (col.render==='name') {
+    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div><div class="contact-title">${esc(row.Job_Title||'')}</div></div></div>`;
+  }
+  if (col.render==='email') return val ? `<a class="email-link" href="mailto:${val}" onclick="event.stopPropagation()">${val}</a>` : dash;
+  if (col.render==='pill') {
+    if (!val) return dash;
+    const MAP = {'C-Suite':'pill-green','VP':'pill-green','Director':'pill-blue','Manager':'pill-blue','Senior':'pill-amber','Junior':'pill-gray','Entry':'pill-gray','Sales':'pill-purple','Marketing':'pill-purple','Engineering':'pill-blue','Finance':'pill-amber','Operations':'pill-gray','HR':'pill-red'};
+    const cls = Object.keys(MAP).find(k=>val.includes(k))||'pill-gray';
+    return `<span class="pill ${cls}">${val}</span>`;
+  }
+  if (col.render==='date') {
+    const d = fmtDate(val); if (!d) return dash;
+    return `<div class="date-cell"><div class="date-main">${d.main}</div><div class="date-ago">${d.ago}</div></div>`;
+  }
+  return esc(val)||dash;
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ━━━ FIX 3 ━━━ Only target row checkboxes (class="row-cb"), not the header checkbox
+function toggleAll(cb){ document.querySelectorAll('#table-wrap tbody input.row-cb').forEach(c=>c.checked=cb.checked); }
+
+function doSort(col){ if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc'; else{sortCol=col;sortDir='asc';} fetchPage(1); }
+
+// ── PAGINATION ────────────────────────────────────────────────────────────────
+function renderPagination() {
+  const from = totalRecords ? (currentPage-1)*PER_PAGE+1 : 0;
+  const to   = Math.min(currentPage*PER_PAGE, totalRecords);
+  document.getElementById('page-info').textContent = `${from.toLocaleString()}-${to.toLocaleString()} of ${totalRecords.toLocaleString()} records`;
+  const btns = [];
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>Prev</button>`);
+  let s = Math.max(1,currentPage-2), e = Math.min(totalPages,currentPage+2);
+  if (s>1) { btns.push(`<button class="page-btn" onclick="goPage(1)">1</button>`); if(s>2) btns.push(`<span style="color:var(--dim);padding:0 4px">…</span>`); }
+  for (let i=s;i<=e;i++) btns.push(`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`);
+  if (e<totalPages) { if(e<totalPages-1) btns.push(`<span style="color:var(--dim);padding:0 4px">…</span>`); btns.push(`<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`); }
+  btns.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages||totalPages===0?'disabled':''}>Next</button>`);
+  document.getElementById('page-btns').innerHTML = btns.join('');
+}
+function goPage(p){ if(p<1||p>totalPages) return; fetchPage(p); document.getElementById('table-wrap').scrollTop=0; }
+
+// ── DETAIL PANEL ──────────────────────────────────────────────────────────────
+async function openDetail(id) {
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('detail-content').innerHTML = '<div class="loading" style="padding:40px"><div class="spinner"></div></div>';
+  try {
+    const res = await fetch(`${API_BASE}/record/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const row = await res.json();
+    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    const f  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>` : '';
+    const l  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>` : '';
+    const fd = (label,key) => { if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
+    document.getElementById('detail-content').innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div class="detail-avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div>
+        <div>
+          <div class="detail-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div>
+          <div class="detail-sub">${esc(row.Job_Title||'—')}</div>
+          <div class="detail-sub" style="color:var(--accent);font-weight:600;margin-top:3px;">${esc(row.Company_Name||'')}</div>
+        </div>
+      </div>
+      <hr class="detail-divider"/>
+      <div class="detail-section-title">Contact Info</div>
+      ${f('Email ABM','Email_ID_ABM')}${f('Email Finding','Email_ID_Finding')}${f('Telephone','Telephone_No')}${f('Alternative No','Alternative_No')}${l('Phone Link','Phone_no_link')}
+      <hr class="detail-divider"/>
+      <div class="detail-section-title">Role</div>
+      ${f('Job Title','Job_Title')}${f('Department','Department')}${f('Seniority','Seniority')}${l('LinkedIn','Social_Media_Link')}
+      <hr class="detail-divider"/>
+      <div class="detail-section-title">Company</div>
+      ${f('Industry','Industry')}${f('Industry Code','Industry_Code')}${f('Emp Size','Emp_Size')}${f('Revenue','Revenue')}${f('Domain','Domain')}${l('Company LinkedIn','Company_Linkedin')}${l('Revenue Link','Revenue_Link')}
+      <hr class="detail-divider"/>
+      <div class="detail-section-title">Location</div>
+      ${f('Address 1','Address_1')}${f('Address 2','Address_2')}${f('City','City')}${f('State','State')}${f('Zip','Zip_Code')}${f('Country','Country')}
+      <hr class="detail-divider"/>
+      <div class="detail-section-title">Meta</div>
+      ${f('Campaign','Campaign_Name')}${fd('Date Added','Date')}${f('RA Name','RA_Name')}${f('RA Comment','RA_Comment')}
+    `;
+  } catch(err) {
+    document.getElementById('detail-content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
+  }
+}
+function closeDetail(){ document.getElementById('detail-panel').classList.remove('open'); }
+
+// ── DOWNLOAD BAR ──────────────────────────────────────────────────────────────
+function dlSetIcon(mode){
+  document.getElementById('dl-svg-down').style.display = mode==='down'  ? '' : 'none';
+  document.getElementById('dl-svg-ok' ).style.display = mode==='ok'    ? '' : 'none';
+  document.getElementById('dl-svg-err').style.display = mode==='error' ? '' : 'none';
+  document.getElementById('dl-icon').className = 'dl-icon'+(mode==='ok'?' done':mode==='error'?' error':'');
+}
+function showDlBar(title,sub){
+  dlSetIcon('down');
+  document.getElementById('dl-title').textContent=title;
+  document.getElementById('dl-sub').textContent=sub;
+  const f=document.getElementById('dl-fill');
+  f.style.width='';f.style.background='';f.className='dl-fill indeterminate';
+  document.getElementById('dl-pct').textContent='';
+  document.getElementById('dl-pct').className='dl-pct';
+  document.getElementById('dl-rows').textContent='';
+  document.getElementById('dl-bar').classList.add('show');
+}
+function updateDlBar(pct,sub,rows){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill';f.style.background='';f.style.width=Math.round(pct)+'%';
+  document.getElementById('dl-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('dl-pct').className='dl-pct';
+  if(sub!==undefined)  document.getElementById('dl-sub').textContent=sub;
+  if(rows!==undefined) document.getElementById('dl-rows').textContent=rows.toLocaleString()+' rows';
+}
+function doneDlBar(totalRows,mb){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill';f.style.width='100%';f.style.background='var(--green)';
+  dlSetIcon('ok');
+  document.getElementById('dl-pct').textContent='Done';
+  document.getElementById('dl-pct').className='dl-pct done';
+  document.getElementById('dl-sub').textContent=mb+' MB saved';
+  document.getElementById('dl-rows').textContent=totalRows.toLocaleString()+' rows';
+  setTimeout(hideDlBar,4000);
+}
+function errorDlBar(msg){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill';f.style.width='100%';f.style.background='var(--red)';
+  dlSetIcon('error');
+  document.getElementById('dl-pct').textContent='Failed';
+  document.getElementById('dl-pct').className='dl-pct error';
+  document.getElementById('dl-sub').textContent=msg;
+  setTimeout(hideDlBar,5000);
+}
+function hideDlBar(){
+  document.getElementById('dl-bar').classList.remove('show');
+  setTimeout(()=>{const f=document.getElementById('dl-fill');f.style.width='0%';f.style.background='';f.className='dl-fill';},300);
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+async function exportCSV(){
+  const params=buildParams(1);
+  params.delete('page');params.delete('limit');params.delete('sortCol');params.delete('sortDir');
+  const filename=`contacts_${new Date().toISOString().slice(0,10)}.csv`;
+  showDlBar(filename,'Getting row count...');
+  try {
+    const countRes=await fetch(`${API_BASE}/export-count?${params}`);
+    if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
+    const {total:totalRows}=await countRes.json();
+    updateDlBar(2,`${totalRows.toLocaleString()} rows to download`,0);
+    const res=await fetch(`${API_BASE}/export?${params}`);
+    if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
+    const headerRows=parseInt(res.headers.get('X-Total-Rows')||'0')||totalRows;
+    if(!res.body){
+      updateDlBar(50,'Downloading...');
+      const blob=await res.blob();
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+      doneDlBar(headerRows,(blob.size/1024/1024).toFixed(1));return;
+    }
+    const reader=res.body.getReader(),decoder=new TextDecoder(),chunks=[];
+    let bytesTotal=0,rowCount=0,partial='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      chunks.push(value);bytesTotal+=value.length;
+      const text=decoder.decode(value,{stream:true});partial+=text;
+      const lines=partial.split('\n');rowCount+=lines.length-1;partial=lines[lines.length-1];
+      const pct=headerRows>0?Math.min(97,Math.round(2+(rowCount/headerRows)*95)):Math.min(97,Math.round(bytesTotal/1024/60));
+      updateDlBar(pct,`${(bytesTotal/1024/1024).toFixed(1)} MB downloaded`,Math.max(0,rowCount-1));
+    }
+    updateDlBar(98,'Saving file...');
+    const blob=new Blob(chunks,{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    doneDlBar(headerRows,(blob.size/1024/1024).toFixed(1));
+  } catch(err){console.error('Export error:',err);errorDlBar(err.message);}
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function copyText(text,msg){if(!text)return;navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!'));}
+function showToast(msg){const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2200);}
+function buildColsMenu(){
+  document.getElementById('cols-menu').innerHTML=COLUMNS.map((c,i)=>
+    `<div class="col-item"><input type="checkbox" id="col-${i}" ${c.visible?'checked':''} onchange="toggleCol(${i})"/><label for="col-${i}">${c.label}</label></div>`
+  ).join('');
+}
+function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();fetchPage(currentPage);}
+function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
+
+loadData();
+</script>
 </body>
 </html>
