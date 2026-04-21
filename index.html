@@ -68,62 +68,93 @@
 
     /* LAYOUT */
     .layout { display: flex; height: calc(100vh - 56px - 89px); }
-    .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
     /* ── MULTI-SELECT FILTER ── */
     .filter-group { margin-bottom: 6px; }
     .filter-header { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; padding: 8px 2px 4px; }
 
-    /* Multi-select trigger button */
+    .ms-widget { position: relative; }
+
+    /* Trigger button */
     .ms-trigger {
-      width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border);
+      width: 100%; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui);
       cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-      gap: 6px; transition: all 0.15s; min-height: 34px;
+      gap: 6px; transition: all 0.15s; min-height: 32px;
     }
-    .ms-trigger:hover { border-color: var(--accent); background: #fff; }
-    .ms-trigger.active { border-color: var(--accent); background: #eef1ff; }
-    .ms-trigger-label { color: var(--muted); font-size: 12px; flex: 1; text-align: left; }
-    .ms-trigger-count { background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: 700; display: none; }
-    .ms-trigger-count.show { display: inline-block; }
-    .ms-chevron { color: var(--dim); font-size: 10px; flex-shrink: 0; transition: transform 0.15s; }
+    .ms-trigger:hover, .ms-trigger.active { border-color: var(--accent); background: #f5f7ff; }
+    .ms-trigger-left { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
+    .ms-trigger-label { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ms-trigger-label.has-value { color: var(--accent); font-weight: 600; }
+    .ms-count-pill { background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .ms-chevron { color: var(--dim); font-size: 9px; flex-shrink: 0; transition: transform 0.15s; }
     .ms-trigger.open .ms-chevron { transform: rotate(180deg); }
 
-    /* Tags row under trigger */
+    /* Selected tags row */
     .ms-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
-    .ms-tag { display: inline-flex; align-items: center; gap: 4px; background: #eef1ff; color: var(--accent); border: 1px solid #d5d9f5; border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 500; max-width: 100%; }
-    .ms-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
-    .ms-tag-x { cursor: pointer; font-size: 12px; line-height: 1; flex-shrink: 0; color: #7a8fd4; }
-    .ms-tag-x:hover { color: var(--red); }
+    .ms-tag { display: inline-flex; align-items: center; gap: 3px; background: #eef1ff; color: var(--accent); border: 1px solid #cdd4f8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 500; max-width: 100%; }
+    .ms-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+    .ms-tag-x { cursor: pointer; font-size: 12px; line-height: 1; flex-shrink: 0; opacity: 0.6; }
+    .ms-tag-x:hover { opacity: 1; color: var(--red); }
 
-    /* Dropdown panel */
+    /* Floating dropdown */
     .ms-dropdown {
-      position: relative; z-index: 50;
+      position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+      z-index: 500;
       background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-top: 4px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
       display: none; flex-direction: column; overflow: hidden;
-      max-height: 260px;
+      max-height: 240px;
     }
     .ms-dropdown.open { display: flex; }
-    .ms-search-wrap { padding: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .ms-search { width: 100%; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: var(--font-ui); color: var(--text); outline: none; }
+    .ms-search-wrap { padding: 7px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .ms-search { width: 100%; padding: 5px 9px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: var(--font-ui); color: var(--text); outline: none; }
     .ms-search:focus { border-color: var(--accent); background: #fff; }
     .ms-list { overflow-y: auto; flex: 1; padding: 4px; }
-    .ms-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text); }
+    .ms-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text); user-select: none; }
     .ms-item:hover { background: var(--bg3); }
     .ms-item.selected { background: #eef1ff; color: var(--accent); font-weight: 600; }
-    .ms-item input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; flex-shrink: 0; cursor: pointer; }
-    .ms-item label { cursor: pointer; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ms-empty { padding: 16px; text-align: center; color: var(--dim); font-size: 12px; }
-    .ms-footer { padding: 6px 8px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .ms-footer-count { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+    .ms-item input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; flex-shrink: 0; cursor: pointer; pointer-events: none; }
+    .ms-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ms-empty { padding: 14px; text-align: center; color: var(--dim); font-size: 12px; }
+    .ms-footer { padding: 5px 8px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+    .ms-footer-count { font-size: 10px; color: var(--muted); }
     .ms-clear-btn { font-size: 11px; color: var(--red); cursor: pointer; font-weight: 600; }
     .ms-clear-btn:hover { text-decoration: underline; }
 
-    /* Text input filter (for job title search-type) */
-    .filter-input { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui); outline: none; transition: all 0.15s; }
-    .filter-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
+    /* ── JOB TITLE TAG INPUT ── */
+    .tag-input-wrap {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+      min-height: 34px; cursor: text; transition: all 0.15s;
+    }
+    .tag-input-wrap:focus-within { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.08); }
+    .tag-input-wrap .ms-tag { font-size: 10px; }
+    .tag-real-input { border: none; outline: none; background: transparent; font-size: 12px; font-family: var(--font-ui); color: var(--text); flex: 1; min-width: 80px; padding: 1px 0; }
+    .tag-real-input::placeholder { color: var(--dim); }
+    .tag-hint { font-size: 10px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
+
+    /* ── COMPANY FILTER ── */
+    .company-filter-box { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+    .company-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .company-tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; border: none; font-family: var(--font-ui); border-bottom: 2px solid transparent; }
+    .company-tab.active { background: var(--bg2); color: var(--accent); border-bottom: 2px solid var(--accent); }
+    .company-tab-content { padding: 8px; display: none; }
+    .company-tab-content.active { display: block; }
+    .company-textarea { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 11px; font-family: var(--font-mono); outline: none; resize: vertical; min-height: 80px; max-height: 200px; line-height: 1.6; }
+    .company-textarea:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.08); }
+    .company-hint { font-size: 10px; color: var(--dim); margin-top: 4px; line-height: 1.5; }
+    .company-actions { display: flex; gap: 4px; margin-top: 6px; }
+    .company-apply-btn { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
+    .company-apply-btn:hover { background: #2f4dd4; }
+    .company-clear-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
+    .company-clear-btn:hover { border-color: var(--red); color: var(--red); }
+    .company-count-badge { display: none; background: #eef1ff; border: 1px solid #cdd4f8; border-radius: 5px; padding: 4px 8px; font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 5px; align-items: center; gap: 6px; }
+    .company-count-badge.show { display: flex; }
+    .company-file-label { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 6px 10px; border-radius: 6px; border: 1px dashed var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 500; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; width: 100%; margin-bottom: 6px; }
+    .company-file-label:hover { border-color: var(--accent); color: var(--accent); }
 
     /* DATE FILTER BOX */
     .date-filter-box { background: linear-gradient(135deg,#eef1ff 0%,#f5f0ff 100%); border: 1px solid #d5d9f5; border-radius: 10px; padding: 12px; margin-bottom: 8px; }
@@ -138,27 +169,6 @@
     .date-badge { display: none; background: #fff8e1; border: 1px solid #ffe082; border-radius: 5px; padding: 5px 8px; font-size: 10px; color: #7a5800; font-weight: 500; margin-top: 8px; align-items: center; justify-content: space-between; }
     .date-badge.show { display: flex; }
     .date-badge-clear { cursor: pointer; font-weight: 700; font-size: 12px; color: #b07800; }
-
-    /* ── COMPANY FILTER ── */
-    .company-filter-box { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
-    .company-tabs { display: flex; border-bottom: 1px solid var(--border); }
-    .company-tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--muted); transition: all 0.15s; border: none; font-family: var(--font-ui); }
-    .company-tab.active { background: var(--bg2); color: var(--accent); border-bottom: 2px solid var(--accent); }
-    .company-tab-content { padding: 8px; display: none; }
-    .company-tab-content.active { display: block; }
-    .company-textarea { width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 11px; font-family: var(--font-mono); outline: none; resize: vertical; min-height: 80px; max-height: 200px; line-height: 1.6; }
-    .company-textarea:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
-    .company-hint { font-size: 10px; color: var(--dim); margin-top: 4px; line-height: 1.5; }
-    .company-actions { display: flex; gap: 4px; margin-top: 6px; }
-    .company-apply-btn { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
-    .company-apply-btn:hover { background: #2f4dd4; }
-    .company-clear-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; }
-    .company-clear-btn:hover { border-color: var(--red); color: var(--red); }
-    .company-count-badge { display: none; background: #eef1ff; border: 1px solid #d5d9f5; border-radius: 5px; padding: 3px 8px; font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 5px; align-items: center; gap: 6px; }
-    .company-count-badge.show { display: flex; }
-    .company-file-label { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); transition: all 0.15s; width: 100%; justify-content: center; margin-bottom: 6px; }
-    .company-file-label:hover { border-color: var(--accent); color: var(--accent); }
-    #company-file-input { display: none; }
 
     /* TOOLBAR */
     .toolbar { padding: 10px 16px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: var(--shadow); }
@@ -269,11 +279,7 @@
     .dl-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; min-width: 80px; }
     .dl-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.4s ease, background 0.3s; }
     .dl-fill.indeterminate { animation: indeterminate 1.5s ease-in-out infinite; }
-    @keyframes indeterminate {
-      0%   { width: 0%;   margin-left: 0%; }
-      50%  { width: 40%;  margin-left: 30%; }
-      100% { width: 0%;   margin-left: 100%; }
-    }
+    @keyframes indeterminate { 0%{width:0%;margin-left:0%} 50%{width:40%;margin-left:30%} 100%{width:0%;margin-left:100%} }
     .dl-stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; min-width: 80px; }
     .dl-pct { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); }
     .dl-pct.done  { color: var(--green); }
@@ -286,7 +292,6 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
-    input[type="checkbox"] { accent-color: var(--accent); }
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
   </style>
 </head>
@@ -399,49 +404,53 @@
       </div>
     </div>
 
-    <!-- SENIORITY multi-select -->
+    <!-- SENIORITY -->
     <div class="filter-group">
       <div class="filter-header">Seniority</div>
       <div id="ms-seniority"></div>
     </div>
 
-    <!-- DEPARTMENT multi-select -->
+    <!-- DEPARTMENT -->
     <div class="filter-group">
       <div class="filter-header">Department</div>
       <div id="ms-department"></div>
     </div>
 
-    <!-- INDUSTRY multi-select -->
+    <!-- INDUSTRY -->
     <div class="filter-group">
       <div class="filter-header">Industry</div>
       <div id="ms-industry"></div>
     </div>
 
-    <!-- COUNTRY multi-select -->
+    <!-- COUNTRY -->
     <div class="filter-group">
       <div class="filter-header">Country</div>
       <div id="ms-country"></div>
     </div>
 
-    <!-- CITY multi-select -->
+    <!-- CITY -->
     <div class="filter-group">
       <div class="filter-header">City</div>
       <div id="ms-city"></div>
     </div>
 
-    <!-- JOB TITLE multi-select / search -->
+    <!-- JOB TITLE — tag input (type + Enter) -->
     <div class="filter-group">
       <div class="filter-header">Job Title</div>
-      <div id="ms-jobtitle"></div>
+      <div class="tag-input-wrap" id="jobtitle-wrap" onclick="document.getElementById('jobtitle-input').focus()">
+        <input class="tag-real-input" id="jobtitle-input" placeholder="Type & press Enter…"
+          onkeydown="handleJobTitleKey(event)" oninput="this.size = Math.max(8, this.value.length+1)"/>
+      </div>
+      <div class="tag-hint">Press <strong>Enter</strong> or <strong>,</strong> to add. Matches partial titles.</div>
     </div>
 
-    <!-- RA NAME multi-select -->
+    <!-- RA NAME -->
     <div class="filter-group">
       <div class="filter-header">RA Name</div>
       <div id="ms-ra"></div>
     </div>
 
-    <!-- COMPANY BULK FILTER -->
+    <!-- COMPANY / DOMAIN BULK FILTER -->
     <div class="filter-group">
       <div class="filter-header">Company / Domain</div>
       <div class="company-filter-box">
@@ -449,33 +458,27 @@
           <button class="company-tab active" onclick="switchCompanyTab(this,'include')">Include</button>
           <button class="company-tab" onclick="switchCompanyTab(this,'exclude')">Exclude</button>
         </div>
-        <!-- Include tab -->
         <div class="company-tab-content active" id="company-tab-include">
-          <label class="company-file-label" for="company-file-input-inc">
-            &#128196; Upload CSV/TXT
-          </label>
-          <input type="file" id="company-file-input-inc" accept=".csv,.txt" onchange="loadCompanyFile(this,'include')"/>
+          <label class="company-file-label" for="company-file-input-inc">&#128196; Upload CSV / TXT</label>
+          <input type="file" id="company-file-input-inc" style="display:none" accept=".csv,.txt" onchange="loadCompanyFile(this,'include')"/>
           <textarea class="company-textarea" id="company-include-text"
-            placeholder="Paste company names or domains, one per line:&#10;Google&#10;apple.com&#10;Microsoft&#10;salesforce.com"></textarea>
-          <div class="company-hint">One name or domain per line. Domains like <em>example.com</em> will also match the Domain field.</div>
+            placeholder="One name or domain per line:&#10;Google&#10;apple.com&#10;Microsoft"></textarea>
+          <div class="company-hint">Domains like <em>apple.com</em> match the Domain field too.</div>
           <div class="company-actions">
-            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply</button>
-            <button class="company-clear-btn" onclick="clearCompanyFilter()">Clear</button>
+            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply Filter</button>
+            <button class="company-clear-btn" onclick="clearCompanyFilter('include')">Clear</button>
           </div>
           <div class="company-count-badge" id="company-inc-badge"></div>
         </div>
-        <!-- Exclude tab -->
         <div class="company-tab-content" id="company-tab-exclude">
-          <label class="company-file-label" for="company-file-input-exc">
-            &#128196; Upload CSV/TXT
-          </label>
-          <input type="file" id="company-file-input-exc" accept=".csv,.txt" onchange="loadCompanyFile(this,'exclude')"/>
+          <label class="company-file-label" for="company-file-input-exc">&#128196; Upload CSV / TXT</label>
+          <input type="file" id="company-file-input-exc" style="display:none" accept=".csv,.txt" onchange="loadCompanyFile(this,'exclude')"/>
           <textarea class="company-textarea" id="company-exclude-text"
-            placeholder="Paste company names or domains to EXCLUDE:&#10;Competitor Inc&#10;badcompany.com"></textarea>
-          <div class="company-hint">These companies/domains will be excluded from results.</div>
+            placeholder="Companies/domains to EXCLUDE:&#10;Competitor Inc&#10;bad.com"></textarea>
+          <div class="company-hint">These will be removed from results.</div>
           <div class="company-actions">
-            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply</button>
-            <button class="company-clear-btn" onclick="clearCompanyFilter()">Clear</button>
+            <button class="company-apply-btn" onclick="applyCompanyFilter()">Apply Filter</button>
+            <button class="company-clear-btn" onclick="clearCompanyFilter('exclude')">Clear</button>
           </div>
           <div class="company-count-badge" id="company-exc-badge"></div>
         </div>
@@ -483,7 +486,7 @@
     </div>
 
     <div style="margin-top:auto;padding-top:14px;">
-      <button class="btn btn-danger" style="width:100%;justify-content:center;" onclick="clearFilters()">&#x2715; Clear All Filters</button>
+      <button class="btn btn-danger" style="width:100%;justify-content:center;" onclick="clearAllFilters()">&#x2715; Clear All Filters</button>
     </div>
   </aside>
 
@@ -529,10 +532,10 @@
       <polyline points="7 10 12 15 17 10"/>
       <line x1="12" y1="15" x2="12" y2="3"/>
     </svg>
-    <svg id="dl-svg-ok" viewBox="0 0 24 24" fill="none" stroke="#0ead69" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+    <svg id="dl-svg-ok" viewBox="0 0 24 24" fill="none" stroke="#0ead69" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
-    <svg id="dl-svg-err" viewBox="0 0 24 24" fill="none" stroke="#e63757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+    <svg id="dl-svg-err" viewBox="0 0 24 24" fill="none" stroke="#e63757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
     </svg>
   </div>
@@ -540,9 +543,7 @@
     <div class="dl-title" id="dl-title">Preparing export...</div>
     <div class="dl-sub"   id="dl-sub">Starting...</div>
   </div>
-  <div class="dl-track">
-    <div class="dl-fill indeterminate" id="dl-fill"></div>
-  </div>
+  <div class="dl-track"><div class="dl-fill indeterminate" id="dl-fill"></div></div>
   <div class="dl-stats">
     <div class="dl-pct"  id="dl-pct"></div>
     <div class="dl-rows" id="dl-rows"></div>
@@ -561,20 +562,22 @@ let debounceTimer = null;
 const PER_PAGE = 50;
 
 // ── MULTI-SELECT STATE ────────────────────────────────────────────────────────
-// Each key: { options: [], selected: Set(), query: '' }
-const MS_FILTERS = {
-  seniority:  { param: 'seniority',  options: [], selected: new Set(), query: '' },
-  department: { param: 'department', options: [], selected: new Set(), query: '' },
-  industry:   { param: 'industry',   options: [], selected: new Set(), query: '' },
-  country:    { param: 'country',    options: [], selected: new Set(), query: '' },
-  city:       { param: 'city',       options: [], selected: new Set(), query: '' },
-  jobtitle:   { param: 'jobtitle',   options: [], selected: new Set(), query: '' },
-  ra:         { param: 'ra',         options: [], selected: new Set(), query: '' },
+// key → { param: string, options: string[], selected: Set }
+const MS = {
+  seniority:  { param: 'seniority',  options: [], selected: new Set() },
+  department: { param: 'department', options: [], selected: new Set() },
+  industry:   { param: 'industry',   options: [], selected: new Set() },
+  country:    { param: 'country',    options: [], selected: new Set() },
+  city:       { param: 'city',       options: [], selected: new Set() },
+  ra:         { param: 'ra',         options: [], selected: new Set() },
 };
 
+// Job title tags (free-text, multi)
+let jobTitleTags = new Set();
+
 // Company filter state
-let companyInclude = [];   // parsed list
-let companyExclude = [];   // parsed list
+let companyInclude = [];
+let companyExclude = [];
 
 const COLUMNS = [
   { key:"First_Name",       label:"Name",            visible:true,  render:"name"  },
@@ -598,16 +601,16 @@ const COLUMNS = [
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
 function pad(n){ return String(n).padStart(2,'0'); }
 function updateClock(){
-  const now=new Date();
-  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('clock-time').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  document.getElementById('clock-date').textContent=`${DAYS[now.getDay()]} ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
+  const now = new Date();
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('clock-time').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  document.getElementById('clock-date').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
 }
-setInterval(updateClock,1000); updateClock();
+setInterval(updateClock, 1000); updateClock();
 
 // ── AVATAR PALETTE ────────────────────────────────────────────────────────────
-const PALETTES=[
+const PALETTES = [
   {bg:'#eef1ff',c:'#4361ee'},{bg:'#e8faf2',c:'#0ead69'},
   {bg:'#f3e8ff',c:'#7209b7'},{bg:'#fff8e6',c:'#b77800'},
   {bg:'#fff0f3',c:'#e63757'},{bg:'#e8f6ff',c:'#0077b6'},
@@ -618,32 +621,32 @@ function pal(name){ return PALETTES[[...(name||'X')].reduce((a,c)=>a+c.charCodeA
 function toYMD(d){ return d.toISOString().slice(0,10); }
 function fmtDate(val){
   if(!val) return null;
-  const d=new Date(val); if(isNaN(d)) return {main:val,ago:''};
-  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const main=`${pad(d.getDate())} ${M[d.getMonth()]} ${d.getFullYear()}`;
-  const diff=Math.floor((Date.now()-d)/86400000);
-  const ago=diff===0?'Today':diff===1?'Yesterday':diff<30?`${diff}d ago`:diff<365?`${Math.floor(diff/30)}mo ago`:`${Math.floor(diff/365)}y ago`;
-  return {main,ago};
+  const d = new Date(val); if(isNaN(d)) return {main:val,ago:''};
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const main = `${pad(d.getDate())} ${M[d.getMonth()]} ${d.getFullYear()}`;
+  const diff = Math.floor((Date.now()-d)/86400000);
+  const ago = diff===0?'Today':diff===1?'Yesterday':diff<30?`${diff}d ago`:diff<365?`${Math.floor(diff/30)}mo ago`:`${Math.floor(diff/365)}y ago`;
+  return {main, ago};
 }
 
 // ── DATE PRESETS ──────────────────────────────────────────────────────────────
-function setPreset(btn,p){
+function setPreset(btn, p){
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const now=new Date(); let from, to=toYMD(now);
-  if      (p==='today')    { from=to; }
-  else if (p==='7d')       { const d=new Date(now); d.setDate(d.getDate()-7);  from=toYMD(d); }
-  else if (p==='30d')      { const d=new Date(now); d.setDate(d.getDate()-30); from=toYMD(d); }
-  else if (p==='90d')      { const d=new Date(now); d.setDate(d.getDate()-90); from=toYMD(d); }
-  else if (p==='thismonth'){ from=toYMD(new Date(now.getFullYear(),now.getMonth(),1)); }
-  else if (p==='lastmonth'){ from=toYMD(new Date(now.getFullYear(),now.getMonth()-1,1)); to=toYMD(new Date(now.getFullYear(),now.getMonth(),0)); }
-  document.getElementById('f-date-from').value=from;
-  document.getElementById('f-date-to').value=to;
+  const now = new Date(); let from, to = toYMD(now);
+  if      (p==='today')     { from = to; }
+  else if (p==='7d')        { const d=new Date(now); d.setDate(d.getDate()-7);  from=toYMD(d); }
+  else if (p==='30d')       { const d=new Date(now); d.setDate(d.getDate()-30); from=toYMD(d); }
+  else if (p==='90d')       { const d=new Date(now); d.setDate(d.getDate()-90); from=toYMD(d); }
+  else if (p==='thismonth') { from=toYMD(new Date(now.getFullYear(),now.getMonth(),1)); }
+  else if (p==='lastmonth') { from=toYMD(new Date(now.getFullYear(),now.getMonth()-1,1)); to=toYMD(new Date(now.getFullYear(),now.getMonth(),0)); }
+  document.getElementById('f-date-from').value = from;
+  document.getElementById('f-date-to').value   = to;
   applyFilters();
 }
 function clearDate(){
-  document.getElementById('f-date-from').value='';
-  document.getElementById('f-date-to').value='';
+  document.getElementById('f-date-from').value = '';
+  document.getElementById('f-date-to').value   = '';
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   applyFilters();
 }
@@ -652,162 +655,193 @@ function clearDate(){
 function buildMultiSelect(key) {
   const container = document.getElementById(`ms-${key}`);
   if (!container) return;
-  const state = MS_FILTERS[key];
-
   container.innerHTML = `
-    <div class="ms-widget">
-      <div class="ms-trigger" id="ms-trigger-${key}" onclick="toggleMsDropdown('${key}')">
-        <span class="ms-trigger-label" id="ms-label-${key}">All</span>
-        <span class="ms-trigger-count" id="ms-count-${key}">0</span>
+    <div class="ms-widget" id="msw-${key}">
+      <div class="ms-trigger" id="mst-${key}" onclick="toggleMs('${key}')">
+        <div class="ms-trigger-left">
+          <span class="ms-trigger-label" id="mslabel-${key}">All</span>
+          <span class="ms-count-pill" id="mscount-${key}" style="display:none"></span>
+        </div>
         <span class="ms-chevron">▼</span>
       </div>
-      <div class="ms-tags" id="ms-tags-${key}"></div>
-      <div class="ms-dropdown" id="ms-dropdown-${key}">
+      <div class="ms-tags" id="mstags-${key}"></div>
+      <div class="ms-dropdown" id="msdd-${key}">
         <div class="ms-search-wrap">
-          <input class="ms-search" id="ms-search-${key}" placeholder="Search..."
-            oninput="filterMsOptions('${key}', this.value)"
-            onclick="event.stopPropagation()"/>
+          <input class="ms-search" id="mssearch-${key}" placeholder="Search ${key}..."
+            oninput="renderMsList('${key}',this.value)" onclick="event.stopPropagation()"/>
         </div>
-        <div class="ms-list" id="ms-list-${key}"></div>
+        <div class="ms-list" id="mslist-${key}"></div>
         <div class="ms-footer">
-          <span class="ms-footer-count" id="ms-footer-count-${key}"></span>
-          <span class="ms-clear-btn" onclick="clearMsFilter('${key}')">Clear</span>
+          <span class="ms-footer-count" id="msfc-${key}"></span>
+          <span class="ms-clear-btn" onclick="clearMs('${key}')">Clear all</span>
         </div>
       </div>
-    </div>
-  `;
-  renderMsList(key);
-  updateMsTrigger(key);
+    </div>`;
+  renderMsList(key, '');
+  refreshMsTrigger(key);
 }
 
-function renderMsList(key) {
-  const state = MS_FILTERS[key];
-  const list = document.getElementById(`ms-list-${key}`);
-  const q = (state.query || '').toLowerCase();
-  const filtered = state.options.filter(o => o.toLowerCase().includes(q));
-
+function renderMsList(key, q) {
+  q = (q||'').toLowerCase().trim();
+  const state = MS[key];
+  const filtered = state.options.filter(o => !q || o.toLowerCase().includes(q));
+  const list = document.getElementById(`mslist-${key}`);
   if (!filtered.length) {
-    list.innerHTML = `<div class="ms-empty">${state.options.length ? 'No matches' : 'Loading...'}</div>`;
-    document.getElementById(`ms-footer-count-${key}`).textContent = '';
+    list.innerHTML = `<div class="ms-empty">${state.options.length===0?'Loading…':'No matches'}</div>`;
+    document.getElementById(`msfc-${key}`).textContent = '';
     return;
   }
   list.innerHTML = filtered.map(o => {
     const sel = state.selected.has(o);
-    const id = `ms-cb-${key}-${o.replace(/\W/g,'_')}`;
-    return `<div class="ms-item${sel?' selected':''}" onclick="toggleMsItem('${key}', ${JSON.stringify(o)})">
-      <input type="checkbox" id="${id}" ${sel?'checked':''} onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})"/>
-      <label for="${id}" onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})">${esc(o)}</label>
+    const safeId = `mscb-${key}-${CSS.escape(o)}`;
+    return `<div class="ms-item${sel?' selected':''}" onclick="toggleMsItem('${key}',${JSON.stringify(o)})">
+      <input type="checkbox" id="${safeId}" ${sel?'checked':''} onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})"/>
+      <span class="ms-item-label" title="${esc(o)}">${esc(o)}</span>
     </div>`;
   }).join('');
-  document.getElementById(`ms-footer-count-${key}`).textContent =
-    `${filtered.length} of ${state.options.length}`;
+  document.getElementById(`msfc-${key}`).textContent = `${filtered.length}/${state.options.length}`;
 }
 
-function filterMsOptions(key, q) {
-  MS_FILTERS[key].query = q;
-  renderMsList(key);
-}
-
-function toggleMsDropdown(key) {
-  const dd = document.getElementById(`ms-dropdown-${key}`);
-  const trigger = document.getElementById(`ms-trigger-${key}`);
+function toggleMs(key) {
+  const dd = document.getElementById(`msdd-${key}`);
+  const trigger = document.getElementById(`mst-${key}`);
   const isOpen = dd.classList.contains('open');
-
-  // Close all other dropdowns
-  Object.keys(MS_FILTERS).forEach(k => {
-    document.getElementById(`ms-dropdown-${k}`)?.classList.remove('open');
-    document.getElementById(`ms-trigger-${k}`)?.classList.remove('open');
+  // Close all
+  Object.keys(MS).forEach(k => {
+    document.getElementById(`msdd-${k}`)?.classList.remove('open');
+    document.getElementById(`mst-${k}`)?.classList.remove('open');
   });
-
   if (!isOpen) {
     dd.classList.add('open');
     trigger.classList.add('open');
-    setTimeout(() => document.getElementById(`ms-search-${key}`)?.focus(), 50);
+    const s = document.getElementById(`mssearch-${key}`);
+    if (s) { s.value = ''; renderMsList(key,''); setTimeout(()=>s.focus(),30); }
   }
 }
 
 function toggleMsItem(key, value) {
-  const state = MS_FILTERS[key];
-  if (state.selected.has(value)) {
-    state.selected.delete(value);
-  } else {
-    state.selected.add(value);
-  }
-  renderMsList(key);
-  updateMsTrigger(key);
+  const state = MS[key];
+  if (state.selected.has(value)) state.selected.delete(value);
+  else state.selected.add(value);
+  // Re-render list preserving current search
+  const q = document.getElementById(`mssearch-${key}`)?.value || '';
+  renderMsList(key, q);
+  refreshMsTrigger(key);
   applyFilters();
 }
 
-function updateMsTrigger(key) {
-  const state = MS_FILTERS[key];
+function refreshMsTrigger(key) {
+  const state = MS[key];
   const count = state.selected.size;
-  const label = document.getElementById(`ms-label-${key}`);
-  const countEl = document.getElementById(`ms-count-${key}`);
-  const trigger = document.getElementById(`ms-trigger-${key}`);
-  const tagsEl = document.getElementById(`ms-tags-${key}`);
+  const label = document.getElementById(`mslabel-${key}`);
+  const pill  = document.getElementById(`mscount-${key}`);
+  const trigger = document.getElementById(`mst-${key}`);
+  const tags  = document.getElementById(`mstags-${key}`);
 
   if (count === 0) {
     label.textContent = 'All';
-    countEl.classList.remove('show');
+    label.className = 'ms-trigger-label';
+    pill.style.display = 'none';
     trigger.classList.remove('active');
-    tagsEl.innerHTML = '';
+    tags.innerHTML = '';
   } else {
     label.textContent = count === 1 ? [...state.selected][0] : `${count} selected`;
-    countEl.textContent = count;
-    countEl.classList.add('show');
+    label.className = 'ms-trigger-label has-value';
+    pill.textContent = count;
+    pill.style.display = 'inline-block';
     trigger.classList.add('active');
-    // Render tags
-    tagsEl.innerHTML = [...state.selected].map(v =>
+    tags.innerHTML = [...state.selected].map(v =>
       `<div class="ms-tag">
-        <span title="${esc(v)}">${esc(v.length > 18 ? v.slice(0,16)+'…' : v)}</span>
-        <span class="ms-tag-x" onclick="removeMsTag('${key}',${JSON.stringify(v)})">×</span>
+        <span title="${esc(v)}">${esc(v.length>20 ? v.slice(0,18)+'…' : v)}</span>
+        <span class="ms-tag-x" onclick="event.stopPropagation();removeMsTag('${key}',${JSON.stringify(v)})">×</span>
       </div>`
     ).join('');
   }
 }
 
 function removeMsTag(key, value) {
-  MS_FILTERS[key].selected.delete(value);
-  renderMsList(key);
-  updateMsTrigger(key);
+  MS[key].selected.delete(value);
+  const q = document.getElementById(`mssearch-${key}`)?.value || '';
+  renderMsList(key, q);
+  refreshMsTrigger(key);
   applyFilters();
 }
 
-function clearMsFilter(key) {
-  MS_FILTERS[key].selected.clear();
-  MS_FILTERS[key].query = '';
-  const s = document.getElementById(`ms-search-${key}`);
-  if (s) s.value = '';
-  renderMsList(key);
-  updateMsTrigger(key);
+function clearMs(key) {
+  MS[key].selected.clear();
+  const s = document.getElementById(`mssearch-${key}`);
+  if (s) { s.value = ''; }
+  renderMsList(key, '');
+  refreshMsTrigger(key);
   applyFilters();
 }
 
 // Close dropdowns on outside click
 document.addEventListener('click', e => {
   if (!e.target.closest('.ms-widget')) {
-    Object.keys(MS_FILTERS).forEach(k => {
-      document.getElementById(`ms-dropdown-${k}`)?.classList.remove('open');
-      document.getElementById(`ms-trigger-${k}`)?.classList.remove('open');
+    Object.keys(MS).forEach(k => {
+      document.getElementById(`msdd-${k}`)?.classList.remove('open');
+      document.getElementById(`mst-${k}`)?.classList.remove('open');
     });
   }
   if (!e.target.closest('.cols-dropdown')) {
-    document.getElementById('cols-menu').classList.remove('open');
+    document.getElementById('cols-menu')?.classList.remove('open');
   }
 });
 
+// ── JOB TITLE TAG INPUT ───────────────────────────────────────────────────────
+function handleJobTitleKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (val && !jobTitleTags.has(val)) {
+      jobTitleTags.add(val);
+      renderJobTitleTags();
+      applyFilters();
+    }
+    e.target.value = '';
+    e.target.size = 8;
+  } else if (e.key === 'Backspace' && e.target.value === '' && jobTitleTags.size > 0) {
+    const last = [...jobTitleTags].pop();
+    jobTitleTags.delete(last);
+    renderJobTitleTags();
+    applyFilters();
+  }
+}
+
+function renderJobTitleTags() {
+  const wrap = document.getElementById('jobtitle-wrap');
+  const input = document.getElementById('jobtitle-input');
+  // Remove old tags but keep input
+  wrap.querySelectorAll('.ms-tag').forEach(t => t.remove());
+  [...jobTitleTags].forEach(v => {
+    const tag = document.createElement('div');
+    tag.className = 'ms-tag';
+    tag.innerHTML = `<span title="${esc(v)}">${esc(v.length>18?v.slice(0,16)+'…':v)}</span><span class="ms-tag-x" onclick="removeJobTag(${JSON.stringify(v)})">×</span>`;
+    wrap.insertBefore(tag, input);
+  });
+}
+
+function removeJobTag(v) {
+  jobTitleTags.delete(v);
+  renderJobTitleTags();
+  applyFilters();
+}
+
 // ── COMPANY FILTER ────────────────────────────────────────────────────────────
 function switchCompanyTab(btn, tab) {
-  document.querySelectorAll('.company-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.company-tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.company-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.company-tab-content').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(`company-tab-${tab}`).classList.add('active');
 }
 
 function parseCompanyText(text) {
-  return text.split('\n')
-    .map(l => l.trim().replace(/,+$/, '').trim())
-    .filter(Boolean);
+  return [...new Set(
+    text.split('\n')
+      .map(l => l.trim().replace(/,+$/, '').trim())
+      .filter(Boolean)
+  )];
 }
 
 function loadCompanyFile(input, type) {
@@ -815,12 +849,13 @@ function loadCompanyFile(input, type) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const text = e.target.result;
-    // Parse CSV: grab first column values
-    const lines = text.split('\n').map(l => l.split(',')[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
-    const textareaId = type === 'include' ? 'company-include-text' : 'company-exclude-text';
-    const existing = document.getElementById(textareaId).value.trim();
-    document.getElementById(textareaId).value = (existing ? existing + '\n' : '') + lines.join('\n');
+    const lines = e.target.result
+      .split('\n')
+      .map(l => l.split(',')[0].replace(/^"|"$/g,'').trim())
+      .filter(Boolean);
+    const tid = type==='include' ? 'company-include-text' : 'company-exclude-text';
+    const existing = document.getElementById(tid).value.trim();
+    document.getElementById(tid).value = (existing?existing+'\n':'')+lines.join('\n');
     showToast(`Loaded ${lines.length} entries from file`);
   };
   reader.readAsText(file);
@@ -828,68 +863,62 @@ function loadCompanyFile(input, type) {
 }
 
 function applyCompanyFilter() {
-  const incText = document.getElementById('company-include-text').value;
-  const excText = document.getElementById('company-exclude-text').value;
-  companyInclude = parseCompanyText(incText);
-  companyExclude = parseCompanyText(excText);
-
-  const incBadge = document.getElementById('company-inc-badge');
-  const excBadge = document.getElementById('company-exc-badge');
-
+  companyInclude = parseCompanyText(document.getElementById('company-include-text').value);
+  companyExclude = parseCompanyText(document.getElementById('company-exclude-text').value);
+  const ib = document.getElementById('company-inc-badge');
+  const eb = document.getElementById('company-exc-badge');
   if (companyInclude.length) {
-    incBadge.innerHTML = `&#10003; ${companyInclude.length} include entries active <span style="cursor:pointer;color:var(--red);margin-left:6px;" onclick="clearCompanyInclude()">×</span>`;
-    incBadge.classList.add('show');
-  } else {
-    incBadge.classList.remove('show');
-  }
+    ib.innerHTML = `✓ ${companyInclude.length} include entries active <span style="cursor:pointer;margin-left:6px;color:var(--red)" onclick="clearCompanyFilter('include')">×</span>`;
+    ib.classList.add('show');
+  } else { ib.classList.remove('show'); }
   if (companyExclude.length) {
-    excBadge.innerHTML = `&#10003; ${companyExclude.length} exclude entries active <span style="cursor:pointer;color:var(--red);margin-left:6px;" onclick="clearCompanyExclude()">×</span>`;
-    excBadge.classList.add('show');
-  } else {
-    excBadge.classList.remove('show');
+    eb.innerHTML = `✓ ${companyExclude.length} exclude entries active <span style="cursor:pointer;margin-left:6px;color:var(--red)" onclick="clearCompanyFilter('exclude')">×</span>`;
+    eb.classList.add('show');
+  } else { eb.classList.remove('show'); }
+  applyFilters();
+}
+
+function clearCompanyFilter(type) {
+  if (!type || type==='include') {
+    document.getElementById('company-include-text').value = '';
+    companyInclude = [];
+    document.getElementById('company-inc-badge').classList.remove('show');
   }
-
+  if (!type || type==='exclude') {
+    document.getElementById('company-exclude-text').value = '';
+    companyExclude = [];
+    document.getElementById('company-exc-badge').classList.remove('show');
+  }
   applyFilters();
-}
-
-function clearCompanyInclude() {
-  document.getElementById('company-include-text').value = '';
-  companyInclude = [];
-  document.getElementById('company-inc-badge').classList.remove('show');
-  applyFilters();
-}
-function clearCompanyExclude() {
-  document.getElementById('company-exclude-text').value = '';
-  companyExclude = [];
-  document.getElementById('company-exc-badge').classList.remove('show');
-  applyFilters();
-}
-function clearCompanyFilter() {
-  clearCompanyInclude();
-  clearCompanyExclude();
 }
 
 // ── BUILD PARAMS ──────────────────────────────────────────────────────────────
-function buildParams(page){
+function buildParams(page) {
   const p = new URLSearchParams();
-  p.set('page', page||1);
+  p.set('page',  page || 1);
   p.set('limit', PER_PAGE);
-  const search  = document.getElementById('search').value.trim();
-  const dFrom   = document.getElementById('f-date-from').value;
-  const dTo     = document.getElementById('f-date-to').value;
-  if(search)  p.set('search',   search);
-  if(dFrom)   p.set('dateFrom', dFrom);
-  if(dTo)     p.set('dateTo',   dTo);
 
-  // Multi-selects
-  Object.entries(MS_FILTERS).forEach(([key, state]) => {
+  const search = document.getElementById('search').value.trim();
+  const dFrom  = document.getElementById('f-date-from').value;
+  const dTo    = document.getElementById('f-date-to').value;
+  if (search) p.set('search',   search);
+  if (dFrom)  p.set('dateFrom', dFrom);
+  if (dTo)    p.set('dateTo',   dTo);
+
+  // Multi-selects — send as pipe-separated values
+  Object.entries(MS).forEach(([key, state]) => {
     if (state.selected.size > 0) {
       p.set(state.param, [...state.selected].join('||'));
     }
   });
 
-  // Company include/exclude
-  if (companyInclude.length) p.set('company', companyInclude.join('||'));
+  // Job title tags
+  if (jobTitleTags.size > 0) {
+    p.set('jobtitle', [...jobTitleTags].join('||'));
+  }
+
+  // Company include / exclude
+  if (companyInclude.length) p.set('company',        companyInclude.join('||'));
   if (companyExclude.length) p.set('companyExclude', companyExclude.join('||'));
 
   p.set('sortCol', sortCol);
@@ -898,67 +927,63 @@ function buildParams(page){
 }
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
-async function loadData(){
+async function loadData() {
   await Promise.all([loadStats(), loadFilters()]);
   buildColsMenu();
   await fetchPage(1);
 }
 
-async function loadStats(){
+async function loadStats() {
   try {
     const res = await fetch(`${API_BASE}/stats`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const s = await res.json();
-    document.getElementById('s-total').textContent     = (s.total||0).toLocaleString();
-    document.getElementById('s-companies').textContent = (s.uniqueCompanies||0).toLocaleString();
-    document.getElementById('s-countries').textContent = (s.uniqueCountries||0).toLocaleString();
-    document.getElementById('s-industries').textContent= (s.uniqueIndustries||0).toLocaleString();
-    document.getElementById('nav-total').textContent   = (s.total||0).toLocaleString();
-    const now=new Date(), M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('s-total').textContent      = (s.total||0).toLocaleString();
+    document.getElementById('s-companies').textContent  = (s.uniqueCompanies||0).toLocaleString();
+    document.getElementById('s-countries').textContent  = (s.uniqueCountries||0).toLocaleString();
+    document.getElementById('s-industries').textContent = (s.uniqueIndustries||0).toLocaleString();
+    document.getElementById('nav-total').textContent    = (s.total||0).toLocaleString();
+    const now = new Date(), M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     document.getElementById('s-updated').textContent = `${now.getDate()} ${M[now.getMonth()]}`;
     document.getElementById('s-time').textContent    = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
     document.getElementById('backend-status').textContent = 'Live';
-  } catch(err){
-    console.error('Stats error:',err);
+  } catch(err) {
+    console.error('Stats error:', err);
     document.getElementById('backend-status').textContent = 'Error';
   }
 }
 
-async function loadFilters(){
+async function loadFilters() {
   try {
     const res = await fetch(`${API_BASE}/filters`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
-    // Populate multi-select options
-    MS_FILTERS.seniority.options  = f.seniority  || [];
-    MS_FILTERS.department.options = f.department || [];
-    MS_FILTERS.industry.options   = f.industry   || [];
-    MS_FILTERS.country.options    = f.country    || [];
-    MS_FILTERS.city.options       = f.city       || [];
-    MS_FILTERS.ra.options         = f.ra         || [];
-    // Job title: use free-text search, no predefined list (leave empty)
-    MS_FILTERS.jobtitle.options   = [];
+    MS.seniority.options  = f.seniority  || [];
+    MS.department.options = f.department || [];
+    MS.industry.options   = f.industry   || [];
+    MS.country.options    = f.country    || [];
+    MS.city.options       = f.city       || [];
+    MS.ra.options         = f.ra         || [];
 
-    // Build all multi-select widgets
-    Object.keys(MS_FILTERS).forEach(k => buildMultiSelect(k));
-  } catch(err){ console.error('Filters error:',err); }
+    Object.keys(MS).forEach(k => buildMultiSelect(k));
+  } catch(err) { console.error('Filters error:', err); }
 }
 
-async function fetchPage(page){
-  currentPage=page;
-  document.getElementById('table-wrap').innerHTML='<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
+async function fetchPage(page) {
+  currentPage = page;
+  document.getElementById('table-wrap').innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
   try {
     const res = await fetch(`${API_BASE}/data?${buildParams(page)}`);
-    if(!res.ok){ const e=await res.json(); throw new Error(e.error||`HTTP ${res.status}`); }
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || `HTTP ${res.status}`); }
     const json = await res.json();
-    totalRecords = json.total||0;
-    totalPages   = json.totalPages||Math.ceil(totalRecords/PER_PAGE);
+    totalRecords = json.total || 0;
+    totalPages   = json.totalPages || Math.ceil(totalRecords/PER_PAGE);
 
-    const dFrom=document.getElementById('f-date-from').value;
-    const dTo  =document.getElementById('f-date-to').value;
-    const badge=document.getElementById('date-badge');
-    if(dFrom||dTo){ badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} → ${dTo||'any'}`; }
+    const dFrom = document.getElementById('f-date-from').value;
+    const dTo   = document.getElementById('f-date-to').value;
+    const badge = document.getElementById('date-badge');
+    if (dFrom||dTo) { badge.classList.add('show'); document.getElementById('date-badge-text').textContent=`${dFrom||'any'} → ${dTo||'any'}`; }
     else { badge.classList.remove('show'); }
 
     document.getElementById('result-num').textContent   = totalRecords.toLocaleString();
@@ -966,78 +991,75 @@ async function fetchPage(page){
     document.getElementById('nav-filtered').textContent = totalRecords.toLocaleString();
     renderTable(json.data||[], (page-1)*PER_PAGE);
     renderPagination();
-  } catch(err){
-    console.error('Fetch error:',err);
-    document.getElementById('table-wrap').innerHTML=`<div class="empty"><div class="empty-icon">&#9888;&#65039;</div>${err.message}</div>`;
+  } catch(err) {
+    console.error('Fetch error:', err);
+    document.getElementById('table-wrap').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
   }
 }
 
-function applyFilters(){ fetchPage(1); }
-function debounceFilter(){ clearTimeout(debounceTimer); debounceTimer=setTimeout(()=>applyFilters(),400); }
+function applyFilters() { fetchPage(1); }
+function debounceFilter() { clearTimeout(debounceTimer); debounceTimer = setTimeout(()=>applyFilters(), 400); }
 
-function clearFilters(){
-  document.getElementById('search').value='';
-  document.getElementById('f-date-from').value='';
-  document.getElementById('f-date-to').value='';
+function clearAllFilters() {
+  document.getElementById('search').value = '';
+  document.getElementById('f-date-from').value = '';
+  document.getElementById('f-date-to').value   = '';
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
-  Object.keys(MS_FILTERS).forEach(k => {
-    MS_FILTERS[k].selected.clear();
-    MS_FILTERS[k].query = '';
-    const s = document.getElementById(`ms-search-${k}`);
+  Object.keys(MS).forEach(k => {
+    MS[k].selected.clear();
+    const s = document.getElementById(`mssearch-${k}`);
     if (s) s.value = '';
-    renderMsList(k);
-    updateMsTrigger(k);
+    renderMsList(k,'');
+    refreshMsTrigger(k);
   });
-  document.getElementById('company-include-text').value = '';
-  document.getElementById('company-exclude-text').value = '';
-  companyInclude = [];
-  companyExclude = [];
-  document.getElementById('company-inc-badge').classList.remove('show');
-  document.getElementById('company-exc-badge').classList.remove('show');
+  jobTitleTags.clear();
+  renderJobTitleTags();
+  document.getElementById('jobtitle-input').value = '';
+  clearCompanyFilter();
   applyFilters();
 }
 
 // ── RENDER TABLE ──────────────────────────────────────────────────────────────
-function renderTable(rows, offset){
-  const vis=COLUMNS.filter(c=>c.visible);
-  if(!rows.length){
-    document.getElementById('table-wrap').innerHTML='<div class="empty"><div class="empty-icon">&#128269;</div>No contacts match your filters.</div>';
+function renderTable(rows, offset) {
+  const vis = COLUMNS.filter(c=>c.visible);
+  if (!rows.length) {
+    document.getElementById('table-wrap').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>No contacts match your filters.</div>';
     return;
   }
-  const thead=`<tr>
+  const thead = `<tr>
     <th style="width:44px;">#</th>
     <th style="width:32px;"><input type="checkbox" onchange="toggleAll(this)"/></th>
-    ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'&#8593;':'&#8595;'):'&#8597;'}</span></th>`).join('')}
+    ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`).join('')}
     <th style="width:68px;"></th>
   </tr>`;
-  const tbody=rows.map((row,i)=>`
+  const tbody = rows.map((row,i)=>`
     <tr onclick="openDetail(${row.id})" style="cursor:pointer">
       <td><span class="row-num">${String(offset+i+1).padStart(4,'0')}</span></td>
       <td onclick="event.stopPropagation()"><input type="checkbox"/></td>
       ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
       <td><div class="row-actions">
-        <div class="ra-btn" title="View"       onclick="event.stopPropagation();openDetail(${row.id})">&#8857;</div>
-        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.Email_ID_ABM||row.Email_ID_Finding||'')}','Email copied!')">&#9000;</div>
+        <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
+        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.Email_ID_ABM||row.Email_ID_Finding||'')}','Email copied!')">⌘</div>
       </div></td>
     </tr>`).join('');
-  document.getElementById('table-wrap').innerHTML=`<table class="table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  document.getElementById('table-wrap').innerHTML = `<table class="table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
 }
 
-function renderCell(col, row){
-  const val=row[col.key]||'', dash=`<span style="color:var(--dim)">&#8212;</span>`;
-  if(col.render==='name'){
-    const p=pal(row.First_Name||'X'), init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+function renderCell(col, row) {
+  const val = row[col.key]||'', dash = `<span style="color:var(--dim)">—</span>`;
+  if (col.render==='name') {
+    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
     return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div><div class="contact-title">${esc(row.Job_Title||'')}</div></div></div>`;
   }
-  if(col.render==='email') return val?`<a class="email-link" href="mailto:${val}" onclick="event.stopPropagation()">${val}</a>`:dash;
-  if(col.render==='pill'){
-    if(!val) return dash;
-    const MAP={'C-Suite':'pill-green','VP':'pill-green','Director':'pill-blue','Manager':'pill-blue','Senior':'pill-amber','Junior':'pill-gray','Entry':'pill-gray','Sales':'pill-purple','Marketing':'pill-purple','Engineering':'pill-blue','Finance':'pill-amber','Operations':'pill-gray','HR':'pill-red'};
-    const cls=Object.keys(MAP).find(k=>val.includes(k))||'pill-gray';
+  if (col.render==='email') return val ? `<a class="email-link" href="mailto:${val}" onclick="event.stopPropagation()">${val}</a>` : dash;
+  if (col.render==='pill') {
+    if (!val) return dash;
+    const MAP = {'C-Suite':'pill-green','VP':'pill-green','Director':'pill-blue','Manager':'pill-blue','Senior':'pill-amber','Junior':'pill-gray','Entry':'pill-gray','Sales':'pill-purple','Marketing':'pill-purple','Engineering':'pill-blue','Finance':'pill-amber','Operations':'pill-gray','HR':'pill-red'};
+    const cls = Object.keys(MAP).find(k=>val.includes(k))||'pill-gray';
     return `<span class="pill ${cls}">${val}</span>`;
   }
-  if(col.render==='date'){
-    const d=fmtDate(val); if(!d) return dash;
+  if (col.render==='date') {
+    const d = fmtDate(val); if (!d) return dash;
     return `<div class="date-cell"><div class="date-main">${d.main}</div><div class="date-ago">${d.ago}</div></div>`;
   }
   return esc(val)||dash;
@@ -1048,35 +1070,34 @@ function toggleAll(cb){ document.querySelectorAll('#table-wrap tbody input[type=
 function doSort(col){ if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc'; else{sortCol=col;sortDir='asc';} fetchPage(1); }
 
 // ── PAGINATION ────────────────────────────────────────────────────────────────
-function renderPagination(){
-  const from=totalRecords?(currentPage-1)*PER_PAGE+1:0;
-  const to=Math.min(currentPage*PER_PAGE,totalRecords);
-  document.getElementById('page-info').textContent=`${from.toLocaleString()}-${to.toLocaleString()} of ${totalRecords.toLocaleString()} records`;
-  const btns=[];
+function renderPagination() {
+  const from = totalRecords ? (currentPage-1)*PER_PAGE+1 : 0;
+  const to   = Math.min(currentPage*PER_PAGE, totalRecords);
+  document.getElementById('page-info').textContent = `${from.toLocaleString()}-${to.toLocaleString()} of ${totalRecords.toLocaleString()} records`;
+  const btns = [];
   btns.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>Prev</button>`);
-  let s=Math.max(1,currentPage-2), e=Math.min(totalPages,currentPage+2);
-  if(s>1){ btns.push(`<button class="page-btn" onclick="goPage(1)">1</button>`); if(s>2) btns.push(`<span style="color:var(--dim);padding:0 4px;">...</span>`); }
-  for(let i=s;i<=e;i++) btns.push(`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`);
-  if(e<totalPages){ if(e<totalPages-1) btns.push(`<span style="color:var(--dim);padding:0 4px;">...</span>`); btns.push(`<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`); }
+  let s = Math.max(1,currentPage-2), e = Math.min(totalPages,currentPage+2);
+  if (s>1) { btns.push(`<button class="page-btn" onclick="goPage(1)">1</button>`); if(s>2) btns.push(`<span style="color:var(--dim);padding:0 4px">…</span>`); }
+  for (let i=s;i<=e;i++) btns.push(`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`);
+  if (e<totalPages) { if(e<totalPages-1) btns.push(`<span style="color:var(--dim);padding:0 4px">…</span>`); btns.push(`<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`); }
   btns.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages||totalPages===0?'disabled':''}>Next</button>`);
-  document.getElementById('page-btns').innerHTML=btns.join('');
+  document.getElementById('page-btns').innerHTML = btns.join('');
 }
-
 function goPage(p){ if(p<1||p>totalPages) return; fetchPage(p); document.getElementById('table-wrap').scrollTop=0; }
 
 // ── DETAIL PANEL ──────────────────────────────────────────────────────────────
-async function openDetail(id){
+async function openDetail(id) {
   document.getElementById('detail-panel').classList.add('open');
-  document.getElementById('detail-content').innerHTML='<div class="loading" style="padding:40px"><div class="spinner"></div></div>';
+  document.getElementById('detail-content').innerHTML = '<div class="loading" style="padding:40px"><div class="spinner"></div></div>';
   try {
-    const res=await fetch(`${API_BASE}/record/${id}`);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const row=await res.json();
-    const p=pal(row.First_Name||'X'), init=((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
-    const f=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>`:'';
-    const l=(label,key)=>row[key]?`<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>`:'';
-    const fd=(label,key)=>{ if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
-    document.getElementById('detail-content').innerHTML=`
+    const res = await fetch(`${API_BASE}/record/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const row = await res.json();
+    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    const f  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>` : '';
+    const l  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>` : '';
+    const fd = (label,key) => { if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
+    document.getElementById('detail-content').innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div class="detail-avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div>
         <div>
@@ -1101,153 +1122,109 @@ async function openDetail(id){
       <div class="detail-section-title">Meta</div>
       ${f('Campaign','Campaign_Name')}${fd('Date Added','Date')}${f('RA Name','RA_Name')}${f('RA Comment','RA_Comment')}
     `;
-  } catch(err){
-    document.getElementById('detail-content').innerHTML=`<div class="empty"><div class="empty-icon">&#9888;</div>${err.message}</div>`;
+  } catch(err) {
+    document.getElementById('detail-content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
   }
 }
 function closeDetail(){ document.getElementById('detail-panel').classList.remove('open'); }
 
 // ── DOWNLOAD BAR ──────────────────────────────────────────────────────────────
 function dlSetIcon(mode){
-  document.getElementById('dl-svg-down').style.display = mode==='down'  ?'':'none';
-  document.getElementById('dl-svg-ok' ).style.display = mode==='ok'    ?'':'none';
-  document.getElementById('dl-svg-err').style.display = mode==='error' ?'':'none';
-  const icon = document.getElementById('dl-icon');
-  icon.className = 'dl-icon' + (mode==='ok'?' done':mode==='error'?' error':'');
+  document.getElementById('dl-svg-down').style.display = mode==='down'  ? '' : 'none';
+  document.getElementById('dl-svg-ok' ).style.display = mode==='ok'    ? '' : 'none';
+  document.getElementById('dl-svg-err').style.display = mode==='error' ? '' : 'none';
+  document.getElementById('dl-icon').className = 'dl-icon'+(mode==='ok'?' done':mode==='error'?' error':'');
 }
-
-function showDlBar(title, sub){
+function showDlBar(title,sub){
   dlSetIcon('down');
-  document.getElementById('dl-title').textContent = title;
-  document.getElementById('dl-sub').textContent   = sub;
-  const f = document.getElementById('dl-fill');
-  f.style.width=''; f.style.background=''; f.className='dl-fill indeterminate';
-  document.getElementById('dl-pct').textContent  = '';
-  document.getElementById('dl-pct').className    = 'dl-pct';
-  document.getElementById('dl-rows').textContent = '';
+  document.getElementById('dl-title').textContent=title;
+  document.getElementById('dl-sub').textContent=sub;
+  const f=document.getElementById('dl-fill');
+  f.style.width='';f.style.background='';f.className='dl-fill indeterminate';
+  document.getElementById('dl-pct').textContent='';
+  document.getElementById('dl-pct').className='dl-pct';
+  document.getElementById('dl-rows').textContent='';
   document.getElementById('dl-bar').classList.add('show');
 }
-
-function updateDlBar(pct, sub, rows){
-  const f = document.getElementById('dl-fill');
-  f.className='dl-fill'; f.style.background=''; f.style.width=Math.round(pct)+'%';
-  document.getElementById('dl-pct').textContent  = Math.round(pct)+'%';
-  document.getElementById('dl-pct').className    = 'dl-pct';
-  if(sub  !== undefined) document.getElementById('dl-sub').textContent  = sub;
-  if(rows !== undefined) document.getElementById('dl-rows').textContent = rows.toLocaleString()+' rows';
-}
-
-function doneDlBar(totalRows, mb){
+function updateDlBar(pct,sub,rows){
   const f=document.getElementById('dl-fill');
-  f.className='dl-fill'; f.style.width='100%'; f.style.background='var(--green)';
-  dlSetIcon('ok');
-  document.getElementById('dl-pct').textContent  = 'Done';
-  document.getElementById('dl-pct').className    = 'dl-pct done';
-  document.getElementById('dl-sub').textContent  = mb+' MB saved';
-  document.getElementById('dl-rows').textContent = totalRows.toLocaleString()+' rows';
-  setTimeout(hideDlBar, 4000);
+  f.className='dl-fill';f.style.background='';f.style.width=Math.round(pct)+'%';
+  document.getElementById('dl-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('dl-pct').className='dl-pct';
+  if(sub!==undefined)  document.getElementById('dl-sub').textContent=sub;
+  if(rows!==undefined) document.getElementById('dl-rows').textContent=rows.toLocaleString()+' rows';
 }
-
+function doneDlBar(totalRows,mb){
+  const f=document.getElementById('dl-fill');
+  f.className='dl-fill';f.style.width='100%';f.style.background='var(--green)';
+  dlSetIcon('ok');
+  document.getElementById('dl-pct').textContent='Done';
+  document.getElementById('dl-pct').className='dl-pct done';
+  document.getElementById('dl-sub').textContent=mb+' MB saved';
+  document.getElementById('dl-rows').textContent=totalRows.toLocaleString()+' rows';
+  setTimeout(hideDlBar,4000);
+}
 function errorDlBar(msg){
   const f=document.getElementById('dl-fill');
-  f.className='dl-fill'; f.style.width='100%'; f.style.background='var(--red)';
+  f.className='dl-fill';f.style.width='100%';f.style.background='var(--red)';
   dlSetIcon('error');
-  document.getElementById('dl-pct').textContent = 'Failed';
-  document.getElementById('dl-pct').className   = 'dl-pct error';
-  document.getElementById('dl-sub').textContent = msg;
-  setTimeout(hideDlBar, 5000);
+  document.getElementById('dl-pct').textContent='Failed';
+  document.getElementById('dl-pct').className='dl-pct error';
+  document.getElementById('dl-sub').textContent=msg;
+  setTimeout(hideDlBar,5000);
 }
-
 function hideDlBar(){
   document.getElementById('dl-bar').classList.remove('show');
-  setTimeout(()=>{
-    const f=document.getElementById('dl-fill');
-    f.style.width='0%'; f.style.background=''; f.className='dl-fill';
-  },300);
+  setTimeout(()=>{const f=document.getElementById('dl-fill');f.style.width='0%';f.style.background='';f.className='dl-fill';},300);
 }
 
 // ── EXPORT CSV ────────────────────────────────────────────────────────────────
 async function exportCSV(){
-  const params = buildParams(1);
-  params.delete('page'); params.delete('limit'); params.delete('sortCol'); params.delete('sortDir');
-  const filename = `contacts_${new Date().toISOString().slice(0,10)}.csv`;
-
-  showDlBar(filename, 'Getting row count...');
-
+  const params=buildParams(1);
+  params.delete('page');params.delete('limit');params.delete('sortCol');params.delete('sortDir');
+  const filename=`contacts_${new Date().toISOString().slice(0,10)}.csv`;
+  showDlBar(filename,'Getting row count...');
   try {
-    const countRes = await fetch(`${API_BASE}/export-count?${params}`);
+    const countRes=await fetch(`${API_BASE}/export-count?${params}`);
     if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
-    const { total: totalRows } = await countRes.json();
-    updateDlBar(2, `${totalRows.toLocaleString()} rows to download`, 0);
-
-    const res = await fetch(`${API_BASE}/export?${params}`);
+    const {total:totalRows}=await countRes.json();
+    updateDlBar(2,`${totalRows.toLocaleString()} rows to download`,0);
+    const res=await fetch(`${API_BASE}/export?${params}`);
     if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
-
-    const headerRows = parseInt(res.headers.get('X-Total-Rows')||'0') || totalRows;
-
+    const headerRows=parseInt(res.headers.get('X-Total-Rows')||'0')||totalRows;
     if(!res.body){
-      updateDlBar(50, 'Downloading...');
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-      doneDlBar(headerRows, (blob.size/1024/1024).toFixed(1));
-      return;
+      updateDlBar(50,'Downloading...');
+      const blob=await res.blob();
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+      doneDlBar(headerRows,(blob.size/1024/1024).toFixed(1));return;
     }
-
-    const reader   = res.body.getReader();
-    const decoder  = new TextDecoder();
-    const chunks   = [];
-    let bytesTotal = 0;
-    let rowCount   = 0;
-    let partial    = '';
-
+    const reader=res.body.getReader(),decoder=new TextDecoder(),chunks=[];
+    let bytesTotal=0,rowCount=0,partial='';
     while(true){
-      const { done, value } = await reader.read();
-      if(done) break;
-      chunks.push(value);
-      bytesTotal += value.length;
-      const text = decoder.decode(value, { stream: true });
-      partial += text;
-      const lines = partial.split('\n');
-      rowCount += lines.length - 1;
-      partial = lines[lines.length - 1];
-      const pct = headerRows > 0
-        ? Math.min(97, Math.round(2 + (rowCount / headerRows) * 95))
-        : Math.min(97, Math.round(bytesTotal / 1024 / 60));
-      const mb = (bytesTotal / 1024 / 1024).toFixed(1);
-      updateDlBar(pct, `${mb} MB downloaded`, Math.max(0, rowCount - 1));
+      const{done,value}=await reader.read();if(done)break;
+      chunks.push(value);bytesTotal+=value.length;
+      const text=decoder.decode(value,{stream:true});partial+=text;
+      const lines=partial.split('\n');rowCount+=lines.length-1;partial=lines[lines.length-1];
+      const pct=headerRows>0?Math.min(97,Math.round(2+(rowCount/headerRows)*95)):Math.min(97,Math.round(bytesTotal/1024/60));
+      updateDlBar(pct,`${(bytesTotal/1024/1024).toFixed(1)} MB downloaded`,Math.max(0,rowCount-1));
     }
-
-    updateDlBar(98, 'Saving file...');
-    const blob = new Blob(chunks, { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-    doneDlBar(headerRows, (blob.size/1024/1024).toFixed(1));
-
-  } catch(err){
-    console.error('Export error:', err);
-    errorDlBar(err.message);
-  }
+    updateDlBar(98,'Saving file...');
+    const blob=new Blob(chunks,{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    doneDlBar(headerRows,(blob.size/1024/1024).toFixed(1));
+  } catch(err){console.error('Export error:',err);errorDlBar(err.message);}
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function copyText(text, msg){
-  if(!text) return;
-  navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!'));
-}
-function showToast(msg){
-  const el=document.createElement('div');
-  el.className='toast'; el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 2200);
-}
+function copyText(text,msg){if(!text)return;navigator.clipboard.writeText(text).then(()=>showToast(msg||'Copied!'));}
+function showToast(msg){const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2200);}
 function buildColsMenu(){
   document.getElementById('cols-menu').innerHTML=COLUMNS.map((c,i)=>
     `<div class="col-item"><input type="checkbox" id="col-${i}" ${c.visible?'checked':''} onchange="toggleCol(${i})"/><label for="col-${i}">${c.label}</label></div>`
   ).join('');
 }
-function toggleCol(i){ COLUMNS[i].visible=!COLUMNS[i].visible; buildColsMenu(); fetchPage(currentPage); }
-function toggleColsMenu(){ document.getElementById('cols-menu').classList.toggle('open'); }
+function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();fetchPage(currentPage);}
+function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
 
 loadData();
 </script>
