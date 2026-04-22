@@ -71,67 +71,82 @@
     .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
-    /* ── MULTI-SELECT FILTER ── */
+    /* ── FILTER GROUP ── */
     .filter-group { margin-bottom: 6px; }
     .filter-header { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; padding: 8px 2px 4px; }
 
-    .ms-widget { position: relative; }
+    /* ── SMART FILTER WIDGET ──
+       Search box + tag pills. No checkboxes. Paste a comma/newline list or type + Enter.
+    ─────────────────────────── */
+    .sf-widget { position: relative; }
 
-    /* Trigger button */
-    .ms-trigger {
-      width: 100%; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: var(--font-ui);
-      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-      gap: 6px; transition: all 0.15s; min-height: 32px;
+    /* Tag input area (acts as the trigger) */
+    .sf-input-wrap {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+      min-height: 34px; cursor: text; transition: all 0.15s;
     }
-    .ms-trigger:hover, .ms-trigger.active { border-color: var(--accent); background: #f5f7ff; }
-    .ms-trigger-left { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
-    .ms-trigger-label { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ms-trigger-label.has-value { color: var(--accent); font-weight: 600; }
-    .ms-count-pill { background: var(--accent); color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 700; flex-shrink: 0; }
-    .ms-chevron { color: var(--dim); font-size: 9px; flex-shrink: 0; transition: transform 0.15s; }
-    .ms-trigger.open .ms-chevron { transform: rotate(180deg); }
+    .sf-input-wrap:focus-within,
+    .sf-input-wrap.open { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.08); }
 
-    /* Selected tags row */
-    .ms-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
-    .ms-tag { display: inline-flex; align-items: center; gap: 3px; background: #eef1ff; color: var(--accent); border: 1px solid #cdd4f8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 500; max-width: 100%; }
-    .ms-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
-    .ms-tag-x { cursor: pointer; font-size: 12px; line-height: 1; flex-shrink: 0; opacity: 0.6; }
-    .ms-tag-x:hover { opacity: 1; color: var(--red); }
+    .sf-real-input {
+      border: none; outline: none; background: transparent;
+      font-size: 12px; font-family: var(--font-ui); color: var(--text);
+      flex: 1; min-width: 80px; padding: 1px 0;
+    }
+    .sf-real-input::placeholder { color: var(--dim); }
 
-    /* Floating dropdown */
-    .ms-dropdown {
+    /* Tags inside the input */
+    .sf-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: #eef1ff; color: var(--accent); border: 1px solid #cdd4f8;
+      border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 500;
+    }
+    .sf-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+    .sf-tag-x { cursor: pointer; font-size: 12px; line-height: 1; opacity: 0.6; }
+    .sf-tag-x:hover { opacity: 1; color: var(--red); }
+
+    /* Hint below input */
+    .sf-hint { font-size: 10px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
+
+    /* Dropdown suggestion list */
+    .sf-dropdown {
       position: absolute; left: 0; right: 0; top: calc(100% + 4px);
       z-index: 500;
       background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
       box-shadow: 0 8px 28px rgba(0,0,0,0.14);
       display: none; flex-direction: column; overflow: hidden;
-      max-height: 240px;
+      max-height: 220px;
     }
-    .ms-dropdown.open { display: flex; }
-    .ms-search-wrap { padding: 7px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .ms-search { width: 100%; padding: 5px 9px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: var(--font-ui); color: var(--text); outline: none; }
-    .ms-search:focus { border-color: var(--accent); background: #fff; }
-    .ms-list { overflow-y: auto; flex: 1; padding: 4px; }
-    .ms-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text); user-select: none; }
-    .ms-item:hover { background: var(--bg3); }
-    .ms-item.selected { background: #eef1ff; color: var(--accent); font-weight: 600; }
-    .ms-item input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; flex-shrink: 0; cursor: pointer; }
-    .ms-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ms-empty { padding: 14px; text-align: center; color: var(--dim); font-size: 12px; }
-    .ms-footer { padding: 5px 8px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
-    .ms-footer-count { font-size: 10px; color: var(--muted); }
-    .ms-clear-btn { font-size: 11px; color: var(--red); cursor: pointer; font-weight: 600; }
-    .ms-clear-btn:hover { text-decoration: underline; }
+    .sf-dropdown.open { display: flex; }
+    .sf-list { overflow-y: auto; flex: 1; padding: 4px; }
+    .sf-item {
+      padding: 6px 10px; border-radius: 6px; cursor: pointer;
+      font-size: 12px; color: var(--text); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+      transition: background 0.1s;
+    }
+    .sf-item:hover { background: #eef1ff; color: var(--accent); }
+    .sf-item.selected { background: #eef1ff; color: var(--accent); font-weight: 600; }
+    .sf-item.selected::after { content: ' ✓'; font-size: 10px; }
+    .sf-empty { padding: 14px; text-align: center; color: var(--dim); font-size: 12px; }
+    .sf-footer {
+      padding: 5px 10px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg); flex-shrink: 0;
+    }
+    .sf-footer-count { font-size: 10px; color: var(--muted); }
+    .sf-clear-btn { font-size: 11px; color: var(--red); cursor: pointer; font-weight: 600; }
+    .sf-clear-btn:hover { text-decoration: underline; }
 
-    /* ── JOB TITLE TAG INPUT ── */
+    /* ── JOB TITLE TAG INPUT (free text, no dropdown) ── */
     .tag-input-wrap {
       background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
       min-height: 34px; cursor: text; transition: all 0.15s;
     }
     .tag-input-wrap:focus-within { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.08); }
-    .tag-input-wrap .ms-tag { font-size: 10px; }
+    .tag-input-wrap .sf-tag { font-size: 10px; }
     .tag-real-input { border: none; outline: none; background: transparent; font-size: 12px; font-family: var(--font-ui); color: var(--text); flex: 1; min-width: 80px; padding: 1px 0; }
     .tag-real-input::placeholder { color: var(--dim); }
     .tag-hint { font-size: 10px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
@@ -407,34 +422,34 @@
     <!-- SENIORITY -->
     <div class="filter-group">
       <div class="filter-header">Seniority</div>
-      <div id="ms-seniority"></div>
+      <div id="sf-seniority"></div>
     </div>
 
     <!-- DEPARTMENT -->
     <div class="filter-group">
       <div class="filter-header">Department</div>
-      <div id="ms-department"></div>
+      <div id="sf-department"></div>
     </div>
 
     <!-- INDUSTRY -->
     <div class="filter-group">
       <div class="filter-header">Industry</div>
-      <div id="ms-industry"></div>
+      <div id="sf-industry"></div>
     </div>
 
     <!-- COUNTRY -->
     <div class="filter-group">
       <div class="filter-header">Country</div>
-      <div id="ms-country"></div>
+      <div id="sf-country"></div>
     </div>
 
     <!-- CITY -->
     <div class="filter-group">
       <div class="filter-header">City</div>
-      <div id="ms-city"></div>
+      <div id="sf-city"></div>
     </div>
 
-    <!-- JOB TITLE — tag input (type + Enter) -->
+    <!-- JOB TITLE — free text tag input -->
     <div class="filter-group">
       <div class="filter-header">Job Title</div>
       <div class="tag-input-wrap" id="jobtitle-wrap" onclick="document.getElementById('jobtitle-input').focus()">
@@ -442,12 +457,6 @@
           onkeydown="handleJobTitleKey(event)" oninput="this.size = Math.max(8, this.value.length+1)"/>
       </div>
       <div class="tag-hint">Press <strong>Enter</strong> or <strong>,</strong> to add. Matches partial titles.</div>
-    </div>
-
-    <!-- RA NAME -->
-    <div class="filter-group">
-      <div class="filter-header">RA Name</div>
-      <div id="ms-ra"></div>
     </div>
 
     <!-- COMPANY / DOMAIN BULK FILTER -->
@@ -561,15 +570,14 @@ let sortCol = "id", sortDir = "asc";
 let debounceTimer = null;
 const PER_PAGE = 50;
 
-// ── MULTI-SELECT STATE ────────────────────────────────────────────────────────
-// key → { param: string, options: string[], selected: Set }
-const MS = {
+// ── SMART FILTER STATE ────────────────────────────────────────────────────────
+// Each SF widget: { param, options, selected: Set, open: bool }
+const SF = {
   seniority:  { param: 'seniority',  options: [], selected: new Set() },
   department: { param: 'department', options: [], selected: new Set() },
   industry:   { param: 'industry',   options: [], selected: new Set() },
   country:    { param: 'country',    options: [], selected: new Set() },
   city:       { param: 'city',       options: [], selected: new Set() },
-  ra:         { param: 'ra',         options: [], selected: new Set() },
 };
 
 // Job title tags (free-text, multi)
@@ -651,138 +659,191 @@ function clearDate(){
   applyFilters();
 }
 
-// ── MULTI-SELECT WIDGET ───────────────────────────────────────────────────────
-function buildMultiSelect(key) {
-  const container = document.getElementById(`ms-${key}`);
+// ── SMART FILTER WIDGET ───────────────────────────────────────────────────────
+// No checkboxes. Type to search, click to select, selected values shown as tags.
+// Also accepts pasted comma/newline-separated values.
+
+function buildSmartFilter(key) {
+  const container = document.getElementById(`sf-${key}`);
   if (!container) return;
   container.innerHTML = `
-    <div class="ms-widget" id="msw-${key}">
-      <div class="ms-trigger" id="mst-${key}" onclick="toggleMs('${key}')">
-        <div class="ms-trigger-left">
-          <span class="ms-trigger-label" id="mslabel-${key}">All</span>
-          <span class="ms-count-pill" id="mscount-${key}" style="display:none"></span>
-        </div>
-        <span class="ms-chevron">▼</span>
+    <div class="sf-widget" id="sfw-${key}">
+      <div class="sf-input-wrap" id="sfwrap-${key}"
+           onclick="focusSfInput('${key}')" >
+        <input
+          class="sf-real-input" id="sfinput-${key}"
+          placeholder="Search or paste values…"
+          autocomplete="off"
+          oninput="onSfInput('${key}',this.value)"
+          onkeydown="onSfKey('${key}',event)"
+          onfocus="openSfDd('${key}')"
+          onpaste="onSfPaste('${key}',event)"
+        />
       </div>
-      <div class="ms-tags" id="mstags-${key}"></div>
-      <div class="ms-dropdown" id="msdd-${key}">
-        <div class="ms-search-wrap">
-          <input class="ms-search" id="mssearch-${key}" placeholder="Search ${key}..."
-            oninput="renderMsList('${key}',this.value)" onclick="event.stopPropagation()"/>
-        </div>
-        <div class="ms-list" id="mslist-${key}"></div>
-        <div class="ms-footer">
-          <span class="ms-footer-count" id="msfc-${key}"></span>
-          <span class="ms-clear-btn" onclick="clearMs('${key}')">Clear all</span>
+      <div class="sf-dropdown" id="sfdd-${key}">
+        <div class="sf-list" id="sflist-${key}"></div>
+        <div class="sf-footer">
+          <span class="sf-footer-count" id="sffc-${key}"></span>
+          <span class="sf-clear-btn" onclick="clearSf('${key}')">Clear all</span>
         </div>
       </div>
     </div>`;
-  renderMsList(key, '');
-  refreshMsTrigger(key);
+  renderSfTags(key);
+  renderSfList(key, '');
 }
 
-function renderMsList(key, q) {
-  q = (q||'').toLowerCase().trim();
-  const state = MS[key];
+function focusSfInput(key) {
+  document.getElementById(`sfinput-${key}`)?.focus();
+}
+
+function openSfDd(key) {
+  // Close others
+  Object.keys(SF).forEach(k => {
+    if (k !== key) closeSfDd(k);
+  });
+  const dd = document.getElementById(`sfdd-${key}`);
+  const wrap = document.getElementById(`sfwrap-${key}`);
+  dd.classList.add('open');
+  wrap.classList.add('open');
+  renderSfList(key, document.getElementById(`sfinput-${key}`)?.value || '');
+}
+
+function closeSfDd(key) {
+  document.getElementById(`sfdd-${key}`)?.classList.remove('open');
+  document.getElementById(`sfwrap-${key}`)?.classList.remove('open');
+}
+
+function onSfInput(key, val) {
+  openSfDd(key);
+  renderSfList(key, val);
+}
+
+function onSfKey(key, e) {
+  // Enter → add typed value as tag if it partially matches or is custom
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = e.target.value.trim();
+    if (!val) return;
+    // find first matching option
+    const state = SF[key];
+    const match = state.options.find(o => o.toLowerCase().includes(val.toLowerCase()));
+    const toAdd = match || val; // add exact match first, fallback to typed
+    if (toAdd && !state.selected.has(toAdd)) {
+      state.selected.add(toAdd);
+      renderSfTags(key);
+      applyFilters();
+    }
+    e.target.value = '';
+    renderSfList(key, '');
+  } else if (e.key === 'Escape') {
+    closeSfDd(key);
+    e.target.blur();
+  } else if (e.key === 'Backspace' && e.target.value === '' && SF[key].selected.size > 0) {
+    const last = [...SF[key].selected].pop();
+    SF[key].selected.delete(last);
+    renderSfTags(key);
+    applyFilters();
+  }
+}
+
+function onSfPaste(key, e) {
+  // Allow pasting comma or newline-separated values
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  const vals = text.split(/[\n,]+/).map(v => v.trim()).filter(Boolean);
+  const state = SF[key];
+  let added = 0;
+  vals.forEach(v => {
+    // Try exact match first (case-insensitive), then partial
+    const exact = state.options.find(o => o.toLowerCase() === v.toLowerCase());
+    const partial = state.options.find(o => o.toLowerCase().includes(v.toLowerCase()));
+    const toAdd = exact || partial || v;
+    if (toAdd && !state.selected.has(toAdd)) {
+      state.selected.add(toAdd);
+      added++;
+    }
+  });
+  if (added > 0) {
+    renderSfTags(key);
+    renderSfList(key, '');
+    applyFilters();
+    showToast(`Added ${added} filter${added>1?'s':''}`);
+  }
+  document.getElementById(`sfinput-${key}`).value = '';
+}
+
+function selectSfItem(key, value) {
+  const state = SF[key];
+  if (state.selected.has(value)) {
+    state.selected.delete(value);
+  } else {
+    state.selected.add(value);
+  }
+  renderSfTags(key);
+  renderSfList(key, document.getElementById(`sfinput-${key}`)?.value || '');
+  applyFilters();
+  // Keep dropdown open so user can multi-select
+}
+
+function renderSfList(key, q) {
+  q = (q || '').toLowerCase().trim();
+  const state = SF[key];
   const filtered = state.options.filter(o => !q || o.toLowerCase().includes(q));
-  const list = document.getElementById(`mslist-${key}`);
+  const list = document.getElementById(`sflist-${key}`);
+  if (!list) return;
   if (!filtered.length) {
-    list.innerHTML = `<div class="ms-empty">${state.options.length===0?'Loading…':'No matches'}</div>`;
-    document.getElementById(`msfc-${key}`).textContent = '';
+    list.innerHTML = `<div class="sf-empty">${state.options.length === 0 ? 'Loading…' : 'No matches'}</div>`;
+    document.getElementById(`sffc-${key}`).textContent = '';
     return;
   }
   list.innerHTML = filtered.map(o => {
     const sel = state.selected.has(o);
-    const safeId = `mscb-${key}-${CSS.escape(o)}`;
-    return `<div class="ms-item${sel?' selected':''}" onclick="toggleMsItem('${key}',${JSON.stringify(o)})">
-      <input type="checkbox" id="${safeId}" ${sel?'checked':''} onclick="event.stopPropagation();toggleMsItem('${key}',${JSON.stringify(o)})"/>
-      <span class="ms-item-label" title="${esc(o)}">${esc(o)}</span>
-    </div>`;
+    return `<div class="sf-item${sel?' selected':''}"
+      onclick="selectSfItem('${key}',${JSON.stringify(o)})"
+      title="${esc(o)}">${esc(o)}</div>`;
   }).join('');
-  document.getElementById(`msfc-${key}`).textContent = `${filtered.length}/${state.options.length}`;
+  document.getElementById(`sffc-${key}`).textContent =
+    `${filtered.length} of ${state.options.length}`;
 }
 
-function toggleMs(key) {
-  const dd = document.getElementById(`msdd-${key}`);
-  const trigger = document.getElementById(`mst-${key}`);
-  const isOpen = dd.classList.contains('open');
-  // Close all
-  Object.keys(MS).forEach(k => {
-    document.getElementById(`msdd-${k}`)?.classList.remove('open');
-    document.getElementById(`mst-${k}`)?.classList.remove('open');
+function renderSfTags(key) {
+  const state = SF[key];
+  const wrap = document.getElementById(`sfwrap-${key}`);
+  const input = document.getElementById(`sfinput-${key}`);
+  if (!wrap || !input) return;
+  // Remove existing tags
+  wrap.querySelectorAll('.sf-tag').forEach(t => t.remove());
+  [...state.selected].forEach(v => {
+    const tag = document.createElement('div');
+    tag.className = 'sf-tag';
+    tag.innerHTML = `<span title="${esc(v)}">${esc(v.length > 18 ? v.slice(0,16)+'…' : v)}</span>
+      <span class="sf-tag-x" onclick="event.stopPropagation();removeSfTag('${key}',${JSON.stringify(v)})">×</span>`;
+    wrap.insertBefore(tag, input);
   });
-  if (!isOpen) {
-    dd.classList.add('open');
-    trigger.classList.add('open');
-    const s = document.getElementById(`mssearch-${key}`);
-    if (s) { s.value = ''; renderMsList(key,''); setTimeout(()=>s.focus(),30); }
-  }
+  // Update placeholder
+  input.placeholder = state.selected.size > 0 ? 'Add more…' : 'Search or paste values…';
 }
 
-function toggleMsItem(key, value) {
-  const state = MS[key];
-  if (state.selected.has(value)) state.selected.delete(value);
-  else state.selected.add(value);
-  // Re-render list preserving current search
-  const q = document.getElementById(`mssearch-${key}`)?.value || '';
-  renderMsList(key, q);
-  refreshMsTrigger(key);
+function removeSfTag(key, value) {
+  SF[key].selected.delete(value);
+  renderSfTags(key);
+  renderSfList(key, document.getElementById(`sfinput-${key}`)?.value || '');
   applyFilters();
 }
 
-function refreshMsTrigger(key) {
-  const state = MS[key];
-  const count = state.selected.size;
-  const label = document.getElementById(`mslabel-${key}`);
-  const pill  = document.getElementById(`mscount-${key}`);
-  const trigger = document.getElementById(`mst-${key}`);
-  const tags  = document.getElementById(`mstags-${key}`);
-
-  if (count === 0) {
-    label.textContent = 'All';
-    label.className = 'ms-trigger-label';
-    pill.style.display = 'none';
-    trigger.classList.remove('active');
-    tags.innerHTML = '';
-  } else {
-    label.textContent = count === 1 ? [...state.selected][0] : `${count} selected`;
-    label.className = 'ms-trigger-label has-value';
-    pill.textContent = count;
-    pill.style.display = 'inline-block';
-    trigger.classList.add('active');
-    tags.innerHTML = [...state.selected].map(v =>
-      `<div class="ms-tag">
-        <span title="${esc(v)}">${esc(v.length>20 ? v.slice(0,18)+'…' : v)}</span>
-        <span class="ms-tag-x" onclick="event.stopPropagation();removeMsTag('${key}',${JSON.stringify(v)})">×</span>
-      </div>`
-    ).join('');
-  }
-}
-
-function removeMsTag(key, value) {
-  MS[key].selected.delete(value);
-  const q = document.getElementById(`mssearch-${key}`)?.value || '';
-  renderMsList(key, q);
-  refreshMsTrigger(key);
-  applyFilters();
-}
-
-function clearMs(key) {
-  MS[key].selected.clear();
-  const s = document.getElementById(`mssearch-${key}`);
-  if (s) { s.value = ''; }
-  renderMsList(key, '');
-  refreshMsTrigger(key);
+function clearSf(key) {
+  SF[key].selected.clear();
+  const input = document.getElementById(`sfinput-${key}`);
+  if (input) input.value = '';
+  renderSfTags(key);
+  renderSfList(key, '');
   applyFilters();
 }
 
 // Close dropdowns on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest('.ms-widget')) {
-    Object.keys(MS).forEach(k => {
-      document.getElementById(`msdd-${k}`)?.classList.remove('open');
-      document.getElementById(`mst-${k}`)?.classList.remove('open');
-    });
+  if (!e.target.closest('.sf-widget')) {
+    Object.keys(SF).forEach(k => closeSfDd(k));
   }
   if (!e.target.closest('.cols-dropdown')) {
     document.getElementById('cols-menu')?.classList.remove('open');
@@ -812,14 +873,15 @@ function handleJobTitleKey(e) {
 function renderJobTitleTags() {
   const wrap = document.getElementById('jobtitle-wrap');
   const input = document.getElementById('jobtitle-input');
-  // Remove old tags but keep input
-  wrap.querySelectorAll('.ms-tag').forEach(t => t.remove());
+  wrap.querySelectorAll('.sf-tag').forEach(t => t.remove());
   [...jobTitleTags].forEach(v => {
     const tag = document.createElement('div');
-    tag.className = 'ms-tag';
-    tag.innerHTML = `<span title="${esc(v)}">${esc(v.length>18?v.slice(0,16)+'…':v)}</span><span class="ms-tag-x" onclick="removeJobTag(${JSON.stringify(v)})">×</span>`;
+    tag.className = 'sf-tag';
+    tag.innerHTML = `<span title="${esc(v)}">${esc(v.length>18?v.slice(0,16)+'…':v)}</span>
+      <span class="sf-tag-x" onclick="removeJobTag(${JSON.stringify(v)})">×</span>`;
     wrap.insertBefore(tag, input);
   });
+  input.placeholder = jobTitleTags.size > 0 ? 'Add more…' : 'Type & press Enter…';
 }
 
 function removeJobTag(v) {
@@ -905,8 +967,8 @@ function buildParams(page) {
   if (dFrom)  p.set('dateFrom', dFrom);
   if (dTo)    p.set('dateTo',   dTo);
 
-  // Multi-selects — send as pipe-separated values
-  Object.entries(MS).forEach(([key, state]) => {
+  // Smart filters — send as pipe-separated values
+  Object.entries(SF).forEach(([key, state]) => {
     if (state.selected.size > 0) {
       p.set(state.param, [...state.selected].join('||'));
     }
@@ -959,14 +1021,13 @@ async function loadFilters() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
-    MS.seniority.options  = f.seniority  || [];
-    MS.department.options = f.department || [];
-    MS.industry.options   = f.industry   || [];
-    MS.country.options    = f.country    || [];
-    MS.city.options       = f.city       || [];
-    MS.ra.options         = f.ra         || [];
+    SF.seniority.options  = f.seniority  || [];
+    SF.department.options = f.department || [];
+    SF.industry.options   = f.industry   || [];
+    SF.country.options    = f.country    || [];
+    SF.city.options       = f.city       || [];
 
-    Object.keys(MS).forEach(k => buildMultiSelect(k));
+    Object.keys(SF).forEach(k => buildSmartFilter(k));
   } catch(err) { console.error('Filters error:', err); }
 }
 
@@ -1005,12 +1066,13 @@ function clearAllFilters() {
   document.getElementById('f-date-from').value = '';
   document.getElementById('f-date-to').value   = '';
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
-  Object.keys(MS).forEach(k => {
-    MS[k].selected.clear();
-    const s = document.getElementById(`mssearch-${k}`);
-    if (s) s.value = '';
-    renderMsList(k,'');
-    refreshMsTrigger(k);
+  Object.keys(SF).forEach(k => {
+    SF[k].selected.clear();
+    const inp = document.getElementById(`sfinput-${k}`);
+    if (inp) inp.value = '';
+    renderSfTags(k);
+    renderSfList(k, '');
+    closeSfDd(k);
   });
   jobTitleTags.clear();
   renderJobTitleTags();
@@ -1027,19 +1089,15 @@ function renderTable(rows, offset) {
     return;
   }
 
-  // ━━━ FIX 1 ━━━ Header checkbox: stop propagation on <th> AND on <input>
   const thead = `<tr>
     <th style="width:44px;">#</th>
-    <th style="width:32px;cursor:default;" onclick="event.stopPropagation()"><input type="checkbox" onchange="toggleAll(this)" onclick="event.stopPropagation()"/></th>
     ${vis.map(c=>`<th onclick="doSort('${c.key}')" class="${sortCol===c.key?'sorted':''}">${c.label}<span class="sort-icon">${sortCol===c.key?(sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`).join('')}
     <th style="width:68px;"></th>
   </tr>`;
 
-  // ━━━ FIX 2 ━━━ Row checkbox: add onclick stopPropagation on <input> + class="row-cb"
   const tbody = rows.map((row,i)=>`
     <tr onclick="openDetail(${row.id})" style="cursor:pointer">
       <td><span class="row-num">${String(offset+i+1).padStart(4,'0')}</span></td>
-      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onclick="event.stopPropagation()"/></td>
       ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
       <td><div class="row-actions">
         <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
@@ -1070,9 +1128,6 @@ function renderCell(col, row) {
 }
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ━━━ FIX 3 ━━━ Only target row checkboxes (class="row-cb"), not the header checkbox
-function toggleAll(cb){ document.querySelectorAll('#table-wrap tbody input.row-cb').forEach(c=>c.checked=cb.checked); }
 
 function doSort(col){ if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc'; else{sortCol=col;sortDir='asc';} fetchPage(1); }
 
@@ -1234,10 +1289,6 @@ function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();fet
 function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
 
 loadData();
-  function applyFilters() {
-  console.log("Filters triggered");
-  fetchPage(1);
-}
 </script>
 </body>
 </html>
