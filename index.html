@@ -308,9 +308,109 @@
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+    /* ── LOGIN OVERLAY ───────────────────────────────────────────────────────── */
+    #login-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: linear-gradient(135deg, #eef1ff 0%, #f5f0ff 50%, #f0f8ff 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #login-overlay.hidden { display: none; }
+    .login-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(67,97,238,0.13), 0 4px 16px rgba(0,0,0,0.07);
+      padding: 40px 40px 36px; width: 100%; max-width: 400px;
+    }
+    .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .login-logo-icon {
+      width: 44px; height: 44px; background: var(--accent); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(67,97,238,0.35);
+    }
+    .login-logo-icon svg { width: 22px; height: 22px; }
+    .login-logo-text { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+    .login-logo-sub  { font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+    .login-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .login-sub   { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .login-field { margin-bottom: 16px; }
+    .login-label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .login-input {
+      width: 100%; padding: 10px 14px; background: var(--bg);
+      border: 1px solid var(--border2); border-radius: var(--radius);
+      color: var(--text); font-size: 13px; font-family: var(--font-ui);
+      outline: none; transition: all 0.15s;
+    }
+    .login-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
+    .login-btn {
+      width: 100%; padding: 11px; background: var(--accent);
+      border: none; border-radius: var(--radius); color: #fff;
+      font-size: 14px; font-weight: 600; font-family: var(--font-ui);
+      cursor: pointer; transition: all 0.15s; margin-top: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .login-btn:hover  { background: #2f4dd4; }
+    .login-btn:active { transform: scale(0.99); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .login-error {
+      background: #fff0f3; border: 1px solid #fcc; border-radius: var(--radius);
+      color: var(--red); font-size: 12px; font-weight: 500;
+      padding: 9px 13px; margin-bottom: 16px;
+      display: none; align-items: center; gap: 7px;
+    }
+    .login-error.show { display: flex; }
+    .login-spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .login-spinner.show { display: block; }
+    #logout-btn { display: none; }
+    #logout-btn.show { display: inline-flex; }
   </style>
 </head>
 <body>
+
+<!-- ── LOGIN OVERLAY ──────────────────────────────────────────────────────── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          <circle cx="19.5" cy="7" r="2.5" fill="#fff" stroke="none"/>
+          <circle cx="4.5"  cy="7" r="2.5" fill="#fff" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="login-logo-text">Quantyx Intel</div>
+        <div class="login-logo-sub">Intelligence Platform</div>
+      </div>
+    </div>
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Sign in to access the platform</div>
+    <div class="login-error" id="login-error">
+      <span>&#9888;</span>
+      <span id="login-error-msg">Invalid credentials. Please try again.</span>
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-username">Login ID</label>
+      <input class="login-input" type="text" id="login-username"
+             placeholder="Enter your login ID" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-password">Password</label>
+      <input class="login-input" type="password" id="login-password"
+             placeholder="Enter your password" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" id="login-submit-btn" onclick="doLogin()">
+      <div class="login-spinner" id="login-spinner"></div>
+      <span id="login-btn-text">Sign In</span>
+    </button>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="nav">
@@ -351,6 +451,7 @@
     </div>
     <button class="btn" onclick="exportCSV()">&#8595; Export CSV</button>
     <button class="btn btn-primary" onclick="loadData()">&#8635; Refresh</button>
+    <button class="btn btn-danger" id="logout-btn" onclick="doLogout()">&#9211; Logout</button>
   </div>
 </nav>
 
@@ -588,22 +689,26 @@ let companyInclude = [];
 let companyExclude = [];
 
 const COLUMNS = [
-  { key:"First_Name",       label:"Name",            visible:true,  render:"name"  },
-  { key:"Company_Name",     label:"Company",         visible:true,  render:"text"  },
-  { key:"Job_Title",        label:"Job Title",       visible:true,  render:"text"  },
-  { key:"Email_ID_ABM",     label:"Email (ABM)",     visible:true,  render:"email" },
-  { key:"Email_ID_Finding", label:"Email (Finding)", visible:false, render:"email" },
-  { key:"Department",       label:"Department",      visible:true,  render:"pill"  },
-  { key:"Seniority",        label:"Seniority",       visible:true,  render:"pill"  },
-  { key:"Industry",         label:"Industry",        visible:true,  render:"text"  },
-  { key:"Telephone_No",     label:"Phone",           visible:false, render:"text"  },
-  { key:"City",             label:"City",            visible:true,  render:"text"  },
-  { key:"Country",          label:"Country",         visible:true,  render:"text"  },
-  { key:"Emp_Size",         label:"Emp Size",        visible:false, render:"text"  },
-  { key:"Revenue",          label:"Revenue",         visible:false, render:"text"  },
-  { key:"Date",             label:"Date Added",      visible:true,  render:"date"  },
-  { key:"RA_Name",          label:"RA Name",         visible:false, render:"text"  },
-  { key:"Campaign_Name",    label:"Campaign",        visible:false, render:"text"  },
+  { key:"First_Name",           label:"Name",            visible:true,  render:"name"  },
+  { key:"Company_Name",         label:"Company",         visible:true,  render:"text"  },
+  { key:"Job_Title",            label:"Job Title",       visible:true,  render:"text"  },
+  { key:"Email_ID_ABM",         label:"Email (ABM)",     visible:true,  render:"email" },
+  { key:"Email_ID_Finding",     label:"Email (Finding)", visible:false, render:"email" },
+  { key:"Department",           label:"Department",      visible:true,  render:"pill"  },
+  { key:"Seniority",            label:"Seniority",       visible:true,  render:"pill"  },
+  { key:"Industry",             label:"Industry",        visible:true,  render:"text"  },
+  { key:"Telephone_No",         label:"Phone",           visible:false, render:"text"  },
+  { key:"City",                 label:"City",            visible:true,  render:"text"  },
+  { key:"Country",              label:"Country",         visible:true,  render:"text"  },
+  { key:"Emp_Size",             label:"Emp Size",        visible:false, render:"text"  },
+  { key:"Revenue",              label:"Revenue",         visible:false, render:"text"  },
+  { key:"Date",                 label:"Date Added",      visible:true,  render:"date"  },
+  { key:"RA_Name",              label:"RA Name",         visible:false, render:"text"  },
+  { key:"Campaign_Name",        label:"Campaign",        visible:false, render:"text"  },
+  {key : "Social_Media_Link",   label :"Contact Link",   visible:true,  rener:"text"   },
+  {key : "Phone_no_link",       label :"Phone No Linke", visible:false,  rener:"text"  },
+  {key : "Company_Linkedin",    label :"Company Link",   visible:false,  rener:"text"  },
+  {key : "Revenue_Link",        label :"Revenue Link",   visible:true,  rener:"text"   },
 ];
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
@@ -997,7 +1102,7 @@ async function loadData() {
 
 async function loadStats() {
   try {
-    const res = await fetch(`${API_BASE}/stats`);
+    const res = await fetch(`${API_BASE}/stats`, {headers: authHeader(), headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const s = await res.json();
     document.getElementById('s-total').textContent      = (s.total||0).toLocaleString();
@@ -1017,7 +1122,7 @@ async function loadStats() {
 
 async function loadFilters() {
   try {
-    const res = await fetch(`${API_BASE}/filters`);
+    const res = await fetch(`${API_BASE}/filters`, {headers: authHeader(), headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
@@ -1035,7 +1140,7 @@ async function fetchPage(page) {
   currentPage = page;
   document.getElementById('table-wrap').innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
   try {
-    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`);
+    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`, {headers: authHeader(), headers: authHeader()});
     if (!res.ok) { const e = await res.json(); throw new Error(e.error || `HTTP ${res.status}`); }
     const json = await res.json();
     totalRecords = json.total || 0;
@@ -1152,7 +1257,7 @@ async function openDetail(id) {
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('detail-content').innerHTML = '<div class="loading" style="padding:40px"><div class="spinner"></div></div>';
   try {
-    const res = await fetch(`${API_BASE}/record/${id}`);
+    const res = await fetch(`${API_BASE}/record/${id}`, {headers: authHeader(), headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const row = await res.json();
     const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
@@ -1247,11 +1352,11 @@ async function exportCSV(){
   const filename=`contacts_${new Date().toISOString().slice(0,10)}.csv`;
   showDlBar(filename,'Getting row count...');
   try {
-    const countRes=await fetch(`${API_BASE}/export-count?${params}`);
+    const countRes=await fetch(`${API_BASE}/export-count?${params}`, {headers: authHeader(), headers: authHeader()});
     if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
     const {total:totalRows}=await countRes.json();
     updateDlBar(2,`${totalRows.toLocaleString()} rows to download`,0);
-    const res=await fetch(`${API_BASE}/export?${params}`);
+    const res=await fetch(`${API_BASE}/export?${params}`, {headers: authHeader(), headers: authHeader()});
     if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
     const headerRows=parseInt(res.headers.get('X-Total-Rows')||'0')||totalRows;
     if(!res.body){
@@ -1288,7 +1393,107 @@ function buildColsMenu(){
 function toggleCol(i){COLUMNS[i].visible=!COLUMNS[i].visible;buildColsMenu();fetchPage(currentPage);}
 function toggleColsMenu(){document.getElementById('cols-menu').classList.toggle('open');}
 
-loadData();
+// ── AUTH (JWT — works cross-domain GitHub Pages ↔ Render) ────────────────────
+
+// Helper: attach Authorization header to every API request
+function authHeader() {
+  const token = sessionStorage.getItem('qi_token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+// Enter key triggers login
+['login-username','login-password'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errBox   = document.getElementById('login-error');
+  const errMsg   = document.getElementById('login-error-msg');
+  const btn      = document.getElementById('login-submit-btn');
+  const spinner  = document.getElementById('login-spinner');
+  const btnText  = document.getElementById('login-btn-text');
+
+  errBox.classList.remove('show');
+
+  if (!username || !password) {
+    errMsg.textContent = 'Please enter your Login ID and Password.';
+    errBox.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  spinner.classList.add('show');
+  btnText.textContent = 'Signing in…';
+
+  try {
+    const res  = await fetch(`${API_BASE}/auth/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      sessionStorage.setItem('qi_token', data.token);
+      sessionStorage.setItem('qi_user',  data.username);
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('logout-btn').classList.add('show');
+      loadData();
+    } else {
+      errMsg.textContent = data.error || 'Invalid credentials. Please try again.';
+      errBox.classList.add('show');
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-password').focus();
+    }
+  } catch (err) {
+    errMsg.textContent = 'Cannot reach server. Check your connection.';
+    errBox.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    spinner.classList.remove('show');
+    btnText.textContent = 'Sign In';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('qi_token');
+  sessionStorage.removeItem('qi_user');
+  document.getElementById('login-overlay').classList.remove('hidden');
+  document.getElementById('logout-btn').classList.remove('show');
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').classList.remove('show');
+}
+
+// On page load — verify stored token is still valid
+async function checkSession() {
+  const token = sessionStorage.getItem('qi_token');
+  if (!token) {
+    document.getElementById('login-username').focus();
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/auth/verify`, {
+      headers: authHeader(),
+    });
+    if (res.ok) {
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('logout-btn').classList.add('show');
+      loadData();
+    } else {
+      sessionStorage.removeItem('qi_token');
+      document.getElementById('login-username').focus();
+    }
+  } catch {
+    document.getElementById('login-username').focus();
+  }
+}
+
+checkSession();
 </script>
 </body>
 </html>
