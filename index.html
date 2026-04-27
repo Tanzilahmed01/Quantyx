@@ -689,26 +689,24 @@ let companyInclude = [];
 let companyExclude = [];
 
 const COLUMNS = [
-  { key:"First_Name",           label:"Name",            visible:true,  render:"name"  },
-  { key:"Company_Name",         label:"Company",         visible:true,  render:"text"  },
-  { key:"Job_Title",            label:"Job Title",       visible:true,  render:"text"  },
-  { key:"Email_ID_ABM",         label:"Email (ABM)",     visible:true,  render:"email" },
-  { key:"Email_ID_Finding",     label:"Email (Finding)", visible:false, render:"email" },
-  { key:"Department",           label:"Department",      visible:true,  render:"pill"  },
-  { key:"Seniority",            label:"Seniority",       visible:true,  render:"pill"  },
-  { key:"Industry",             label:"Industry",        visible:true,  render:"text"  },
-  { key:"Telephone_No",         label:"Phone",           visible:false, render:"text"  },
-  { key:"City",                 label:"City",            visible:true,  render:"text"  },
-  { key:"Country",              label:"Country",         visible:true,  render:"text"  },
-  { key:"Emp_Size",             label:"Emp Size",        visible:false, render:"text"  },
-  { key:"Revenue",              label:"Revenue",         visible:false, render:"text"  },
-  { key:"Date",                 label:"Date Added",      visible:true,  render:"date"  },
-  { key:"RA_Name",              label:"RA Name",         visible:false, render:"text"  },
-  { key:"Campaign_Name",        label:"Campaign",        visible:false, render:"text"  },
-  {key : "Social_Media_Link",   label :"Contact Link",   visible:true,  rener:"text"   },
-  {key : "Phone_no_link",       label :"Phone No Linke", visible:false,  rener:"text"  },
-  {key : "Company_Linkedin",    label :"Company Link",   visible:false,  rener:"text"  },
-  {key : "Revenue_Link",        label :"Revenue Link",   visible:true,  rener:"text"   },
+  { key:"first_name",        label:"Name",           visible:true,  render:"name"  },
+  { key:"company_name",      label:"Company",        visible:true,  render:"text"  },
+  { key:"job_title",         label:"Job Title",      visible:true,  render:"text"  },
+  { key:"email_id_abm",      label:"Email",          visible:true,  render:"email" },
+  { key:"job_function",      label:"Department",     visible:true,  render:"pill"  },
+  { key:"seniority",         label:"Seniority",      visible:true,  render:"pill"  },
+  { key:"industry",          label:"Industry",       visible:true,  render:"text"  },
+  { key:"telephone_no",      label:"Phone",          visible:false, render:"text"  },
+  { key:"city",              label:"City",           visible:true,  render:"text"  },
+  { key:"country",           label:"Country",        visible:true,  render:"text"  },
+  { key:"emp_size",          label:"Emp Size",       visible:false, render:"text"  },
+  { key:"revenue",           label:"Revenue",        visible:false, render:"text"  },
+  { key:"date",              label:"Date Added",     visible:true,  render:"date"  },
+  { key:"ra_name",           label:"RA Name",        visible:false, render:"text"  },
+  { key:"column_1",          label:"Campaign",       visible:false, render:"text"  },
+  { key:"social_media_link", label:"Contact Link",   visible:true,  render:"text"  },
+  { key:"phone_no_link",     label:"Phone Link",     visible:false, render:"text"  },
+  { key:"company_linkedin",  label:"Company Link",   visible:false, render:"text"  },
 ];
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
@@ -1206,7 +1204,7 @@ function renderTable(rows, offset) {
       ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
       <td><div class="row-actions">
         <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
-        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.Email_ID_ABM||row.Email_ID_Finding||'')}','Email copied!')">⌘</div>
+        <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.email_id_abm||'')}','Email copied!')">⌘</div>
       </div></td>
     </tr>`).join('');
   document.getElementById('table-wrap').innerHTML = `<table class="table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
@@ -1215,8 +1213,8 @@ function renderTable(rows, offset) {
 function renderCell(col, row) {
   const val = row[col.key]||'', dash = `<span style="color:var(--dim)">—</span>`;
   if (col.render==='name') {
-    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
-    return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div><div class="contact-title">${esc(row.Job_Title||'')}</div></div></div>`;
+    const p = pal(row.first_name||'X'), init = ((row.first_name||'')[0]||'')+((row.last_name||'')[0]||'');
+    return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.first_name||'')} ${esc(row.last_name||'')}</div><div class="contact-title">${esc(row.job_title||'')}</div></div></div>`;
   }
   if (col.render==='email') return val ? `<a class="email-link" href="mailto:${val}" onclick="event.stopPropagation()">${val}</a>` : dash;
   if (col.render==='pill') {
@@ -1260,7 +1258,7 @@ async function openDetail(id) {
     const res = await fetch(`${API_BASE}/record/${id}`, {headers: authHeader(), headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const row = await res.json();
-    const p = pal(row.First_Name||'X'), init = ((row.First_Name||'')[0]||'')+((row.Last_Name||'')[0]||'');
+    const p = pal(row.first_name||'X'), init = ((row.first_name||'')[0]||'')+((row.last_name||'')[0]||'');
     const f  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>` : '';
     const l  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>` : '';
     const fd = (label,key) => { if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
@@ -1268,26 +1266,26 @@ async function openDetail(id) {
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div class="detail-avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div>
         <div>
-          <div class="detail-name">${esc(row.First_Name||'')} ${esc(row.Last_Name||'')}</div>
-          <div class="detail-sub">${esc(row.Job_Title||'—')}</div>
-          <div class="detail-sub" style="color:var(--accent);font-weight:600;margin-top:3px;">${esc(row.Company_Name||'')}</div>
+          <div class="detail-name">${esc(row.first_name||'')} ${esc(row.last_name||'')}</div>
+          <div class="detail-sub">${esc(row.job_title||'—')}</div>
+          <div class="detail-sub" style="color:var(--accent);font-weight:600;margin-top:3px;">${esc(row.company_name||'')}</div>
         </div>
       </div>
       <hr class="detail-divider"/>
       <div class="detail-section-title">Contact Info</div>
-      ${f('Email ABM','Email_ID_ABM')}${f('Email Finding','Email_ID_Finding')}${f('Telephone','Telephone_No')}${f('Alternative No','Alternative_No')}${l('Phone Link','Phone_no_link')}
+      ${f('Email','email_id_abm')}${f('Telephone','telephone_no')}${f('Alternative No','alternative_no')}${l('Phone Link','phone_no_link')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Role</div>
-      ${f('Job Title','Job_Title')}${f('Department','Department')}${f('Seniority','Seniority')}${l('LinkedIn','Social_Media_Link')}
+      ${f('Job Title','job_title')}${f('Department','job_function')}${f('Seniority','seniority')}${l('LinkedIn','social_media_link')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Company</div>
-      ${f('Industry','Industry')}${f('Industry Code','Industry_Code')}${f('Emp Size','Emp_Size')}${f('Revenue','Revenue')}${f('Domain','Domain')}${l('Company LinkedIn','Company_Linkedin')}${l('Revenue Link','Revenue_Link')}
+      ${f('Industry','industry')}${f('Industry Code','industry_code')}${f('Emp Size','emp_size')}${f('Revenue','revenue')}${f('Domain','domain')}${l('Company LinkedIn','company_linkedin')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Location</div>
-      ${f('Address 1','Address_1')}${f('Address 2','Address_2')}${f('City','City')}${f('State','State')}${f('Zip','Zip_Code')}${f('Country','Country')}
+      ${f('Address 1','address_1')}${f('Address 2','address_2')}${f('City','city')}${f('State','state')}${f('Zip','zip_code')}${f('Country','country')}
       <hr class="detail-divider"/>
       <div class="detail-section-title">Meta</div>
-      ${f('Campaign','Campaign_Name')}${fd('Date Added','Date')}${f('RA Name','RA_Name')}${f('RA Comment','RA_Comment')}
+      ${f('Campaign','column_1')}${fd('Date Added','date')}${f('RA Name','ra_name')}
     `;
   } catch(err) {
     document.getElementById('detail-content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${err.message}</div>`;
