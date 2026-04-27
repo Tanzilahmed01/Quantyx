@@ -402,8 +402,16 @@
     </div>
     <div class="login-field">
       <label class="login-label" for="login-password">Password</label>
-      <input class="login-input" type="password" id="login-password"
-             placeholder="Enter your password" autocomplete="current-password"/>
+      <div style="position: relative;">
+          <input class="login-input" type="password" id="login-password"
+                placeholder="Enter your password" autocomplete="current-password"/>
+
+          <span onclick="togglePassword()" 
+              style="position:absolute; right:12px; top:50%; transform:translateY(-50%);
+                   cursor:pointer; font-size:14px;">
+          👁
+        </span>
+</div>
     </div>
     <button class="login-btn" id="login-submit-btn" onclick="doLogin()">
       <div class="login-spinner" id="login-spinner"></div>
@@ -952,6 +960,18 @@ document.addEventListener('click', e => {
     document.getElementById('cols-menu')?.classList.remove('open');
   }
 });
+
+// ── Password Eye───────────────────────────────────────────────────────
+
+function togglePassword() {
+  const pass = document.getElementById("login-password");
+
+  if (pass.type === "password") {
+    pass.type = "text";
+  } else {
+    pass.type = "password";
+  }
+}
 
 // ── JOB TITLE TAG INPUT ───────────────────────────────────────────────────────
 function handleJobTitleKey(e) {
