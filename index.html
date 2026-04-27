@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -1144,7 +1145,7 @@ async function loadFilters() {
     const f = await res.json();
 
     SF.seniority.options  = f.seniority  || [];
-    SF.department.options = f.department || [];
+    SF.jobfunction.options = f.jobfunction || [];
     SF.industry.options   = f.industry   || [];
     SF.country.options    = f.country    || [];
     SF.city.options       = f.city       || [];
@@ -1222,11 +1223,11 @@ function renderTable(rows, offset) {
   </tr>`;
 
   const tbody = rows.map((row,i)=>`
-    <tr onclick="openDetail(${row.id||''})" style="cursor:pointer">
+    <tr onclick="openDetail(${row.id})" style="cursor:pointer">
       <td><span class="row-num">${String(offset+i+1).padStart(4,'0')}</span></td>
-      ${vis.map(c=>`<td title="${esc(row[c.key]!=null?String(row[c.key]):'-')}">${renderCell(c,row)}</td>`).join('')}
+      ${vis.map(c=>`<td title="${esc((row[c.key]||'').toString())}">${renderCell(c,row)}</td>`).join('')}
       <td><div class="row-actions">
-        <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id||''})">⊙</div>
+        <div class="ra-btn" title="View" onclick="event.stopPropagation();openDetail(${row.id})">⊙</div>
         <div class="ra-btn" title="Copy email" onclick="event.stopPropagation();copyText('${esc(row.email_id_abm||'')}','Email copied!')">⌘</div>
       </div></td>
     </tr>`).join('');
@@ -1234,9 +1235,7 @@ function renderTable(rows, offset) {
 }
 
 function renderCell(col, row) {
-  const raw = row[col.key];
-  const val = (raw != null && raw !== '') ? String(raw) : '';
-  const dash = `<span style="color:var(--dim)">—</span>`;
+  const val = row[col.key]||'', dash = `<span style="color:var(--dim)">—</span>`;
   if (col.render==='name') {
     const p = pal(row.first_name||'X'), init = ((row.first_name||'')[0]||'')+((row.last_name||'')[0]||'');
     return `<div class="contact-cell"><div class="avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div><div><div class="contact-name">${esc(row.first_name||'')} ${esc(row.last_name||'')}</div><div class="contact-title">${esc(row.job_title||'')}</div></div></div>`;
@@ -1286,7 +1285,7 @@ async function openDetail(id) {
     const p = pal(row.first_name||'X'), init = ((row.first_name||'')[0]||'')+((row.last_name||'')[0]||'');
     const f  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value">${esc(String(row[key]))}</span></div>` : '';
     const l  = (label,key) => row[key] ? `<div class="detail-field"><span class="detail-label">${label}</span><a class="detail-link" href="${row[key]}" target="_blank">Open link</a></div>` : '';
-    const fd = (label,key) => { if(!row[key]) return ''; const d=fmtDate(row[key]); if(!d) return ''; return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
+    const fd = (label,key) => { if(!row[key]) return ''; const d=fmtDate(row[key]); return `<div class="detail-field"><span class="detail-label">${label}</span><span class="detail-value" style="font-family:var(--font-mono);font-size:11px;">${d.main} - ${d.ago}</span></div>`; };
     document.getElementById('detail-content').innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div class="detail-avatar" style="background:${p.bg};color:${p.c};">${init.toUpperCase()||'?'}</div>
