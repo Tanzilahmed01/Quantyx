@@ -1113,14 +1113,14 @@ function buildParams(page) {
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
 async function loadData() {
-  await Promise.all([loadStats(), loadFilters()]);
+  await Promise.allSettled([loadStats(), loadFilters()]);
   buildColsMenu();
   await fetchPage(1);
 }
 
 async function loadStats() {
   try {
-    const res = await fetch(`${API_BASE}/stats`, {headers: authHeader(), headers: authHeader()});
+    const res = await fetch(`${API_BASE}/stats`, {headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const s = await res.json();
     document.getElementById('s-total').textContent      = (s.total||0).toLocaleString();
@@ -1140,7 +1140,7 @@ async function loadStats() {
 
 async function loadFilters() {
   try {
-    const res = await fetch(`${API_BASE}/filters`, {headers: authHeader(), headers: authHeader()});
+    const res = await fetch(`${API_BASE}/filters`, {headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
@@ -1149,16 +1149,20 @@ async function loadFilters() {
     SF.industry.options   = f.industry   || [];
     SF.country.options    = f.country    || [];
     SF.city.options       = f.city       || [];
-
+  } catch(err) {
+    console.error('Filters error:', err);
+    // Keep empty options — filters will still render, just without suggestions
+  } finally {
+    // Always build filter widgets regardless of API success/failure
     Object.keys(SF).forEach(k => buildSmartFilter(k));
-  } catch(err) { console.error('Filters error:', err); }
+  }
 }
 
 async function fetchPage(page) {
   currentPage = page;
   document.getElementById('table-wrap').innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading...</div></div>';
   try {
-    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`, {headers: authHeader(), headers: authHeader()});
+    const res = await fetch(`${API_BASE}/data?${buildParams(page)}`, {headers: authHeader()});
     if (!res.ok) { const e = await res.json(); throw new Error(e.error || `HTTP ${res.status}`); }
     const json = await res.json();
     totalRecords = json.total || 0;
@@ -1275,7 +1279,7 @@ async function openDetail(id) {
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('detail-content').innerHTML = '<div class="loading" style="padding:40px"><div class="spinner"></div></div>';
   try {
-    const res = await fetch(`${API_BASE}/record/${id}`, {headers: authHeader(), headers: authHeader()});
+    const res = await fetch(`${API_BASE}/record/${id}`, {headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const row = await res.json();
     const p = pal(row.first_name||'X'), init = ((row.first_name||'')[0]||'')+((row.last_name||'')[0]||'');
@@ -1370,11 +1374,11 @@ async function exportCSV(){
   const filename=`contacts_${new Date().toISOString().slice(0,10)}.csv`;
   showDlBar(filename,'Getting row count...');
   try {
-    const countRes=await fetch(`${API_BASE}/export-count?${params}`, {headers: authHeader(), headers: authHeader()});
+    const countRes=await fetch(`${API_BASE}/export-count?${params}`, {headers: authHeader()});
     if(!countRes.ok) throw new Error(`Count failed: HTTP ${countRes.status}`);
     const {total:totalRows}=await countRes.json();
     updateDlBar(2,`${totalRows.toLocaleString()} rows to download`,0);
-    const res=await fetch(`${API_BASE}/export?${params}`, {headers: authHeader(), headers: authHeader()});
+    const res=await fetch(`${API_BASE}/export?${params}`, {headers: authHeader()});
     if(!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
     const headerRows=parseInt(res.headers.get('X-Total-Rows')||'0')||totalRows;
     if(!res.body){
