@@ -46,6 +46,13 @@
     .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.8s ease-in-out infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+    /* WAKE-UP BANNER */
+    .wakeup-banner { display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:linear-gradient(90deg,#4361ee,#7209b7); color:#fff; padding:10px 20px; font-size:13px; font-family:var(--font-ui); align-items:center; justify-content:center; gap:10px; box-shadow:0 2px 12px rgba(0,0,0,0.2); }
+    .wakeup-banner.show { display:flex; }
+    .wakeup-spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+    .wakeup-msg { font-weight:500; }
+    .wakeup-sub { font-size:11px; opacity:0.75; }
+
     /* BUTTONS */
     .btn { padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg2); color: var(--text); cursor: pointer; font-size: 12px; font-family: var(--font-ui); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
     .btn:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
@@ -420,6 +427,15 @@
   </div>
 </div>
 
+<!-- WAKE-UP BANNER -->
+<div class="wakeup-banner" id="wakeup-banner">
+  <div class="wakeup-spinner"></div>
+  <div>
+    <span class="wakeup-msg">⚡ Waking up server — this takes ~30 seconds on first load…</span>
+    <span class="wakeup-sub" id="wakeup-elapsed"></span>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-brand">
@@ -682,11 +698,11 @@ const PER_PAGE = 50;
 // ── SMART FILTER STATE ────────────────────────────────────────────────────────
 // Each SF widget: { param, options, selected: Set, open: bool }
 const SF = {
-  seniority:  { param: 'seniority',  options: [], selected: new Set() },
-  department: { param: 'department', options: [], selected: new Set() },
-  industry:   { param: 'industry',   options: [], selected: new Set() },
-  country:    { param: 'country',    options: [], selected: new Set() },
-  city:       { param: 'city',       options: [], selected: new Set() },
+  seniority:   { param: 'seniority',   options: [], selected: new Set() },
+  jobfunction: { param: 'jobfunction', options: [], selected: new Set() },
+  industry:    { param: 'industry',    options: [], selected: new Set() },
+  country:     { param: 'country',     options: [], selected: new Set() },
+  city:        { param: 'city',        options: [], selected: new Set() },
 };
 
 // Job title tags (free-text, multi)
@@ -1111,14 +1127,45 @@ function buildParams(page) {
   return p;
 }
 
+// ── WAKE-UP PING ──────────────────────────────────────────────────────────────
+async function wakeUpServer() {
+  // Quick probe — if server responds fast, skip the banner entirely
+  const FAST_MS = 1500;
+  let bannerTimer = setTimeout(() => {
+    document.getElementById('wakeup-banner').classList.add('show');
+  }, FAST_MS);
+
+  let elapsed = 0;
+  const elapsedEl = document.getElementById('wakeup-elapsed');
+  const ticker = setInterval(() => {
+    elapsed++;
+    elapsedEl.textContent = ` (${elapsed}s)`;
+  }, 1000);
+
+  try {
+    await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(60000) }).catch(() => {});
+  } finally {
+    clearTimeout(bannerTimer);
+    clearInterval(ticker);
+    document.getElementById('wakeup-banner').classList.remove('show');
+  }
+}
+
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
 async function loadData() {
+  await wakeUpServer();
   await Promise.allSettled([loadStats(), loadFilters()]);
   buildColsMenu();
   await fetchPage(1);
 }
 
 async function loadStats() {
+  // Show spinner in each stat card while loading
+  ['s-total','s-companies','s-countries','s-industries'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;"></span>';
+  });
+  document.getElementById('backend-status').textContent = 'Connecting…';
   try {
     const res = await fetch(`${API_BASE}/stats`, {headers: authHeader()});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1134,6 +1181,10 @@ async function loadStats() {
     document.getElementById('backend-status').textContent = 'Live';
   } catch(err) {
     console.error('Stats error:', err);
+    ['s-total','s-companies','s-countries','s-industries'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '—';
+    });
     document.getElementById('backend-status').textContent = 'Error';
   }
 }
@@ -1144,11 +1195,11 @@ async function loadFilters() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
-    SF.seniority.options  = f.seniority  || [];
+    SF.seniority.options   = f.seniority   || [];
     SF.jobfunction.options = f.jobfunction || [];
-    SF.industry.options   = f.industry   || [];
-    SF.country.options    = f.country    || [];
-    SF.city.options       = f.city       || [];
+    SF.industry.options    = f.industry    || [];
+    SF.country.options     = f.country     || [];
+    SF.city.options        = f.city        || [];
   } catch(err) {
     console.error('Filters error:', err);
     // Keep empty options — filters will still render, just without suggestions
@@ -1511,6 +1562,12 @@ async function checkSession() {
       document.getElementById('login-username').focus();
     }
   } catch {
+    // Network error — token may still be valid, show login with hint
+    sessionStorage.removeItem('qi_token');
+    const errMsg = document.getElementById('login-error-msg');
+    const errBox = document.getElementById('login-error');
+    errMsg.textContent = 'Cannot reach server. Please try signing in again.';
+    errBox.classList.add('show');
     document.getElementById('login-username').focus();
   }
 }
