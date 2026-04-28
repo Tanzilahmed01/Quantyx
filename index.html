@@ -44,6 +44,7 @@
     .clock-date { font-size: 9px; letter-spacing: 0.5px; color: var(--dim); }
     .status-dot { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
     .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.8s ease-in-out infinite; }
+    .dot-live.error { background: var(--red); animation: none; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     /* BUTTONS */
@@ -67,7 +68,7 @@
     .stat-sub { font-size: 10px; color: var(--dim); }
 
     /* LAYOUT */
-    .layout { display: flex; height: calc(100vh - 56px - 89px); }
+    .layout { display: flex; height: calc(100vh - 56px - 105px); }
     .sidebar { width: 260px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
@@ -682,11 +683,11 @@ const PER_PAGE = 50;
 // ── SMART FILTER STATE ────────────────────────────────────────────────────────
 // Each SF widget: { param, options, selected: Set, open: bool }
 const SF = {
-  seniority:  { param: 'seniority',  options: [], selected: new Set() },
-  department: { param: 'department', options: [], selected: new Set() },
-  industry:   { param: 'industry',   options: [], selected: new Set() },
-  country:    { param: 'country',    options: [], selected: new Set() },
-  city:       { param: 'city',       options: [], selected: new Set() },
+  seniority:   { param: 'seniority',   options: [], selected: new Set() },
+  jobfunction: { param: 'jobfunction', options: [], selected: new Set() }, // ✅ FIX: was 'department'/'department' — must match HTML id="sf-jobfunction" and backend param
+  industry:    { param: 'industry',    options: [], selected: new Set() },
+  country:     { param: 'country',     options: [], selected: new Set() },
+  city:        { param: 'city',        options: [], selected: new Set() },
 };
 
 // Job title tags (free-text, multi)
@@ -777,7 +778,10 @@ function clearDate(){
 function buildSmartFilter(key) {
   const container = document.getElementById(`sf-${key}`);
   if (!container) return;
-  container.innerHTML = `
+
+  // ✅ FIX: Only build the shell once — rebuilding innerHTML wipes dropdown state
+  if (!document.getElementById(`sfw-${key}`)) {
+    container.innerHTML = `
     <div class="sf-widget" id="sfw-${key}">
       <div class="sf-input-wrap" id="sfwrap-${key}"
            onclick="focusSfInput('${key}')" >
@@ -799,6 +803,7 @@ function buildSmartFilter(key) {
         </div>
       </div>
     </div>`;
+  }
   renderSfTags(key);
   renderSfList(key, '');
 }
@@ -1113,8 +1118,8 @@ function buildParams(page) {
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
 async function loadData() {
-  await Promise.allSettled([loadStats(), loadFilters()]);
-  buildColsMenu();
+  buildColsMenu(); // build column menu immediately, doesn't need API data
+  await Promise.allSettled([loadStats(), loadFilters()]); // ✅ FIX: filters load before first fetchPage so filter options are ready
   await fetchPage(1);
 }
 
@@ -1132,9 +1137,11 @@ async function loadStats() {
     document.getElementById('s-updated').textContent = `${now.getDate()} ${M[now.getMonth()]}`;
     document.getElementById('s-time').textContent    = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
     document.getElementById('backend-status').textContent = 'Live';
+    document.querySelector('.dot-live')?.classList.remove('error');
   } catch(err) {
     console.error('Stats error:', err);
     document.getElementById('backend-status').textContent = 'Error';
+    document.querySelector('.dot-live')?.classList.add('error');
   }
 }
 
@@ -1144,11 +1151,11 @@ async function loadFilters() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const f = await res.json();
 
-    SF.seniority.options  = f.seniority  || [];
-    SF.jobfunction.options = f.jobfunction || [];
-    SF.industry.options   = f.industry   || [];
-    SF.country.options    = f.country    || [];
-    SF.city.options       = f.city       || [];
+    SF.seniority.options   = f.seniority   || [];
+    SF.jobfunction.options = f.jobfunction || []; // ✅ now matches SF key
+    SF.industry.options    = f.industry    || [];
+    SF.country.options     = f.country     || [];
+    SF.city.options        = f.city        || [];
   } catch(err) {
     console.error('Filters error:', err);
     // Keep empty options — filters will still render, just without suggestions
