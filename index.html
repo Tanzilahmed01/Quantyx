@@ -915,9 +915,13 @@ function renderSfList(key, q) {
   list.innerHTML = filtered.map(o => {
     const sel = state.selected.has(o);
     return `<div class="sf-item${sel?' selected':''}"
-      onclick="selectSfItem('${key}',${JSON.stringify(o)})"
+      data-sf-key="${esc(key)}" data-sf-val="${esc(o)}"
       title="${esc(o)}">${esc(o)}</div>`;
   }).join('');
+  // Attach click handlers via event delegation (avoids JSON/quote injection bugs)
+  list.querySelectorAll('.sf-item[data-sf-key]').forEach(el => {
+    el.addEventListener('click', () => selectSfItem(el.dataset.sfKey, el.dataset.sfVal));
+  });
   document.getElementById(`sffc-${key}`).textContent =
     `${filtered.length} of ${state.options.length}`;
 }
@@ -933,7 +937,11 @@ function renderSfTags(key) {
     const tag = document.createElement('div');
     tag.className = 'sf-tag';
     tag.innerHTML = `<span title="${esc(v)}">${esc(v.length > 18 ? v.slice(0,16)+'…' : v)}</span>
-      <span class="sf-tag-x" onclick="event.stopPropagation();removeSfTag('${key}',${JSON.stringify(v)})">×</span>`;
+      <span class="sf-tag-x" data-sf-key="${esc(key)}" data-sf-val="${esc(v)}">×</span>`;
+    tag.querySelector('.sf-tag-x').addEventListener('click', e => {
+      e.stopPropagation();
+      removeSfTag(key, v);
+    });
     wrap.insertBefore(tag, input);
   });
   // Update placeholder
@@ -1006,7 +1014,8 @@ function renderJobTitleTags() {
     const tag = document.createElement('div');
     tag.className = 'sf-tag';
     tag.innerHTML = `<span title="${esc(v)}">${esc(v.length>18?v.slice(0,16)+'…':v)}</span>
-      <span class="sf-tag-x" onclick="removeJobTag(${JSON.stringify(v)})">×</span>`;
+      <span class="sf-tag-x">×</span>`;
+    tag.querySelector('.sf-tag-x').addEventListener('click', () => removeJobTag(v));
     wrap.insertBefore(tag, input);
   });
   input.placeholder = jobTitleTags.size > 0 ? 'Add more…' : 'Type & press Enter…';
